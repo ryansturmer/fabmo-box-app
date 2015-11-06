@@ -8,20 +8,22 @@
 <canvas id="canvas" width="1000" height="1000" style="border: 1px solid black;"></canvas>
 
 <script type="text/javascript">
-	var materialThickness = 0.75;
-	var boxLength = 20.0;
-	var boxWidth = 4.0;
-	var boxTabs = 4;
-	var bitDiameter = 0.25;
-	var feedRate = 60.0;
-	var plungeRate = 15.0;
+	var materialThickness = 0.4;
+	var boxLength = 6.0;
+	var boxWidth = 3.0;
+	var boxTabs = 2;
+	var bitDiameter = 0.125;
+	var feedRate = 120.0;
+	var plungeRate = 30.0;
 	var safeZ = 0.5;
+	var tabWidth = 0.125;
+	var tabThickness = 0.125;
 
 	scale = 1.0;
 	//edge = makeBoxEdge(400.0, 2.0, GENDER_MALE, 50.0, 25);
-	side = makeBoxSide(scale*boxLength, scale*boxWidth, boxTabs, GENDER_MALE, scale*materialThickness, scale*bitDiameter);
+	side = makeBoxSide(scale*boxLength, scale*boxWidth, boxTabs, GENDER_MALE, scale*materialThickness, scale*bitDiameter, tabWidth);
 	side.translate(-side.bounds().xmin, -side.bounds().ymin);
-	codeList = generateGCodeList(side,-materialThickness - 0.015, bitDiameter/2.0, feedRate, plungeRate, safeZ);
+	codeList = generateGCodeList(side,-materialThickness - 0.015, bitDiameter/2.0, feedRate, plungeRate, safeZ, tabThickness);
 	fabmoDashboard.submitJob(codeList.join('\n'), {
 								filename : 'box.nc',
                       			name : 'Box Test'});

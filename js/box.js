@@ -119,6 +119,19 @@ Turtle2D.prototype.bounds = function() {
 	return retval;
 }
 
+var makeSlot = function(width, length, bitDiameter) {
+	t = new Turtle2D();
+	var actualWidth = width - bitDiameter;
+	var actualLength = length - bitDiameter;
+
+	var bitRadius = bitDiameter/2.0;
+	t.abs(-actualWidth/2.0, -bitRadius);
+	t.rel(0,actualLength);
+	t.rel(actualWidth,0);
+	t.rel(0,-actualLength);
+	return t
+}
+
 var makeBoxEdge = function(width, tabs, gender, thickness, bitDiameter) {
 	var segments = tabs*2+1;
 	var gender = gender ? -1.0 : 1.0;
@@ -135,8 +148,6 @@ var makeBoxEdge = function(width, tabs, gender, thickness, bitDiameter) {
 
 	var pol = -gender;
 	for(var i=0; i<segments+1; i++) {
-
-		console.log(pol)
 
 		// Move X
 		t.abs(segLength*i - pol*bitRadius, t.pos.y);

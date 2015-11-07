@@ -18,7 +18,7 @@
 	var safeZ = 0.5;
 	var tabWidth = 0.125;
 	var tabThickness = 0.125;
-
+/*
 	scale = 1.0;
 	//edge = makeBoxEdge(400.0, 2.0, GENDER_MALE, 50.0, 25);
 	side = makeBoxSide(scale*boxLength, scale*boxWidth, boxTabs, GENDER_MALE, scale*materialThickness, scale*bitDiameter, tabWidth);
@@ -30,6 +30,10 @@
 
 	//draw(edge);
 	draw(side);
+	*/
+
+	slot = makeSlot(0.5,1,0.125)
+	console.log(slot.history)
 	//$('#output').html(JSON.stringify(edge.pretty()));
 	function draw(turtle) {
       var canvas = documnet.getElementById('canvas');

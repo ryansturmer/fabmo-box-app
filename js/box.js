@@ -35,6 +35,7 @@ Turtle2D.prototype.rel = function(dx, dy) {
 	this.abs(this.pos.x + dx, this.pos.y + dy);
 }
 
+
 Turtle2D.prototype.translate = function(dx, dy) {
 	var dx = dx || 0.0;
 	var dy = dy || 0.0;
@@ -108,7 +109,7 @@ Turtle2D.prototype.unmark = function() {
 }
 
 Turtle2D.prototype.bounds = function() {
-	retval = {xmin : this.pos.x, xmax : this.pos.x, ymin : this.pos.y, ymax : this.pos.y}
+	var retval = {xmin : this.pos.x, xmax : this.pos.x, ymin : this.pos.y, ymax : this.pos.y}
 	for(i in this.history) {
 		p = this.history[i];
 		retval.xmax = Math.max(p.x, retval.xmax);
@@ -117,6 +118,11 @@ Turtle2D.prototype.bounds = function() {
 		retval.ymin = Math.min(p.y, retval.ymin);
 	}
 	return retval;
+}
+
+Turtle2D.prototype.translateToOrigin = function() {
+	var b = this.bounds();
+	this.translate(-b.xmin, -b.ymin)
 }
 
 Turtle2D.prototype.extend = function(t) {
@@ -129,71 +135,76 @@ var makeSlot = function(width, length, bitDiameter) {
 	t = new Turtle2D();
 	var actualWidth = width - bitDiameter;
 	var actualLength = length - bitDiameter;
-
-	var bitRadius = bitDiameter/2.0;
-	t.abs(-actualWidth/2.0, -bitRadius);
-	t.rel(0,actualLength);
-	t.rel(actualWidth,0);
-	t.rel(0,-actualLength);
-	return t;
-}
-
-var makeBoxEdge2 = function(width, tabs, gender, thickness, bitDiameter) {
-	var slots = tabs + 1;
-	var segments = tabs*2+1
-	var width/segments;
 	var bitRadius = bitDiameter/2.0;
 	var dogBone = Math.sqrt(bitRadius*bitRadius/2.0)/2.0;
 
-	if(segLength < bitDiameter) {
-		throw new Error("Cannot do this many tabs.  Pocket width (" + segLength.toFixed(3) + ") is less than the bit diameter (" + bitDiameter.toFixed(3) + ").")
-	}
+	var bitRadius = bitDiameter/2.0;
+	t.abs(-actualWidth/2.0, -bitRadius);
+	
+	// Up
+	t.rel(0,actualLength);
+	
+	// Dogbone
+	t.rel(-dogBone, dogBone);
+	t.rel(dogBone, -dogBone);
 
-	for(var i=0; i<slots; i++) {
-		// Cut the slots
-	}
+	// Over
+	t.rel(actualWidth,0);
+
+ 	// Dogbone
+	t.rel(dogBone, dogBone);
+	t.rel(-dogBone, -dogBone);
+
+	// Down
+	t.rel(0,-actualLength);
+
+	return t;
 }
 
 var makeBoxEdge = function(width, tabs, gender, thickness, bitDiameter) {
-	var segments = tabs*2+1;
-	var gender = gender ? -1.0 : 1.0;
+	
+	var segments = (tabs*2)-1
 	var segLength = width/segments;
 	var bitRadius = bitDiameter/2.0;
-	var dogBone = Math.sqrt(bitRadius*bitRadius/2.0);
+	var dogBone = Math.sqrt(bitRadius*bitRadius/2.0)/2.0;
+
+	if(gender == GENDER_MALE) {
+		var slots = tabs-1;
+		var loc = segLength*1.5;
+	} else {
+		var slots = tabs;
+		tabs = slots-1;
+		var loc = segLength*0.5;
+	}
 
 	if(segLength < bitDiameter) {
 		throw new Error("Cannot do this many tabs.  Pocket width (" + segLength.toFixed(3) + ") is less than the bit diameter (" + bitDiameter.toFixed(3) + ").")
 	}
 
-	var t = new Turtle2D();
-	t.setPos(-bitRadius/2.0, gender > 0 ? thickness + bitRadius : bitRadius);
+	retval = new Turtle2D();
 
-	var pol = -gender;
-	for(var i=0; i<segments+1; i++) {
-
-		// Move X
-		t.abs(segLength*i - pol*bitRadius, t.pos.y);
-
-		// Dogbone
-		if(pol > 0) {
-			t.rel(pol*dogBone,-pol*dogBone);
-			t.rel(-pol*dogBone, pol*dogBone);
-		}
-
-		// Move Y
-		t.rel(0, pol*thickness);
-		
-
-		// Dogbone
-		if(pol < 0) {
-			t.rel(pol*dogBone,pol*dogBone);
-			t.rel(-pol*dogBone, -pol*dogBone);
-		}
-		pol *= -1;
+	// Cut the slots
+	for(var i=0; i<slots; i++) {
+		slot = makeSlot(segLength, thickness, bitDiameter);
+		slot.translate(loc, 0);
+		retval.extend(slot);
+		loc += 2*segLength;
 	}
-	t.ltrim(3);
-	t.rtrim(3);
-	return t
+
+	if(gender === GENDER_MALE) {
+		retval.rel(segLength+bitRadius, 0);
+		retval.reverse();
+		retval.rel(-segLength+bitRadius, 0);
+		retval.reverse();
+	} else {
+		retval.trim(3);
+		retval.rel(bitRadius, 0);
+		retval.reverse();
+		retval.rel(-bitRadius, 0);
+		retval.reverse()
+	}
+	retval.translateToOrigin();
+	return retval;
 }
 
 var dist = function(a, b) {

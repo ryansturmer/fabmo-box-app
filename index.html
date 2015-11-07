@@ -3,9 +3,10 @@
 <script src="js/lib/jquery.min.js"></script>
 <script src="js/lib/dashboard.js"></script>
 <script src="js/box.js"></script>
+<script src="js/preview.js"></script>
 
 <body>
-<canvas id="canvas" width="1000" height="1000" style="border: 1px solid black;"></canvas>
+<canvas id="canvas" width="800" height="800" style="border: 1px solid black;"></canvas>
 
 <script type="text/javascript">
 	var materialThickness = 0.4;
@@ -18,36 +19,11 @@
 	var safeZ = 0.5;
 	var tabWidth = 0.125;
 	var tabThickness = 0.125;
-/*
-	scale = 1.0;
-	//edge = makeBoxEdge(400.0, 2.0, GENDER_MALE, 50.0, 25);
-	side = makeBoxSide(scale*boxLength, scale*boxWidth, boxTabs, GENDER_MALE, scale*materialThickness, scale*bitDiameter, tabWidth);
-	side.translate(-side.bounds().xmin, -side.bounds().ymin);
-	codeList = generateGCodeList(side,-materialThickness - 0.015, bitDiameter/2.0, feedRate, plungeRate, safeZ, tabThickness);
-	fabmoDashboard.submitJob(codeList.join('\n'), {
-								filename : 'box.nc',
-                      			name : 'Box Test'});
-
-	//draw(edge);
-	draw(side);
-	*/
 
 	slot = makeSlot(0.5,1,0.125)
-	console.log(slot.history)
-	//$('#output').html(JSON.stringify(edge.pretty()));
-	function draw(turtle) {
-      var canvas = documnet.getElementById('canvas');
-      var context = canvas.getContext('2d');
-      context.scale(1,1);
-      context.beginPath();
-      context.moveTo(turtle.history[0].x+500, 500-turtle.history[0].y);
-      for(i in turtle.history) {
-      	p = turtle.history[i];
-      	console.log(p)
-      	context.lineTo(p.x+500, 500-p.y)
-      }
-      context.stroke();
-	}
+	edge = makeBoxEdge(4, 4, GENDER_FEMALE, 0.375, 0.125)
+	preview = new CanvasPreview('canvas');
+	preview.draw(edge);
 </script>
 
 </html>

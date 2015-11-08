@@ -22,12 +22,17 @@ Turtle2D.prototype.setPos = function(x,y) {
 }
 
 Turtle2D.prototype.abs = function(x,y,mark) {
-	if((this.pos.x != x) || (this.pos.y != y)) {
-		this.setPos(x,y);
-		if(this._mark || mark) {
-			this.pos.mark = true;
+	this.setPos(x,y);
+	if(this._mark || mark) {
+		this.pos.mark = true;
+	}
+	if(this.history.length > 0) {
+		var p = this.history[this.history.length-1];
+		if(p.x != x || p.y != y) {
+			this.history.push(this.pos);
 		}
-		this.history.push(this.pos);
+	} else {		
+			this.history.push(this.pos);
 	}
 }
 
@@ -131,10 +136,10 @@ Turtle2D.prototype.extend = function(t) {
 	}
 }
 
-var makeSlot = function(width, length, bitDiameter) {
+var makeSlot = function(width, length, bitDiameter, dogbone) {
 	t = new Turtle2D();
 	var actualWidth = width - bitDiameter;
-	var actualLength = length - bitDiameter;
+	var actualLength = length;
 	var bitRadius = bitDiameter/2.0;
 	var dogBone = Math.sqrt(bitRadius*bitRadius/2.0)/2.0;
 
@@ -145,15 +150,19 @@ var makeSlot = function(width, length, bitDiameter) {
 	t.rel(0,actualLength);
 	
 	// Dogbone
-	t.rel(-dogBone, dogBone);
-	t.rel(dogBone, -dogBone);
+	if(dogbone) {
+		t.rel(-dogBone, dogBone);
+		t.rel(dogBone, -dogBone);
+	}
 
 	// Over
 	t.rel(actualWidth,0);
 
  	// Dogbone
-	t.rel(dogBone, dogBone);
-	t.rel(-dogBone, -dogBone);
+	if(dogbone) {
+		t.rel(dogBone, dogBone);
+		t.rel(-dogBone, -dogBone);		
+	}
 
 	// Down
 	t.rel(0,-actualLength);
@@ -161,7 +170,7 @@ var makeSlot = function(width, length, bitDiameter) {
 	return t;
 }
 
-var makeBoxEdge = function(width, tabs, gender, thickness, bitDiameter) {
+var makeBoxEdge = function(width, tabs, gender, thickness, bitDiameter, dogbone) {
 	
 	var segments = (tabs*2)-1
 	var segLength = width/segments;
@@ -185,22 +194,22 @@ var makeBoxEdge = function(width, tabs, gender, thickness, bitDiameter) {
 
 	// Cut the slots
 	for(var i=0; i<slots; i++) {
-		slot = makeSlot(segLength, thickness, bitDiameter);
+		slot = makeSlot(segLength, thickness, bitDiameter, dogbone);
 		slot.translate(loc, 0);
 		retval.extend(slot);
 		loc += 2*segLength;
 	}
 
 	if(gender === GENDER_MALE) {
-		retval.rel(segLength+bitRadius, 0);
+		retval.rel(segLength+bitDiameter, 0);
 		retval.reverse();
-		retval.rel(-segLength-bitRadius, 0);
+		retval.rel(-segLength-bitDiameter, 0);
 		retval.reverse();
 	} else {
 		retval.trim(3);
-		retval.rel(bitRadius, 0);
+		retval.rel(bitDiameter, 0);
 		retval.reverse();
-		retval.rel(-bitRadius, 0);
+		retval.rel(-bitDiameter, 0);
 		retval.reverse()
 	}
 	retval.translateToOrigin();
@@ -218,31 +227,35 @@ var midpoint = function(a, b) {
 var makeBoxSide = function(length, width, tabs, gender, thickness, bitDiameter, tabWidth) {
 	var dx = length-2*thickness;
 
-	edge1 = makeBoxEdge(width, tabs, gender, thickness, bitDiameter);
+	edge1 = makeBoxEdge(width, tabs, gender, thickness, bitDiameter, true);
+	console.log(edge1.history.length);
 	edge1.pivot(0,0,Math.PI/2.0);
+	console.log(edge1.history.length);
+
+	edge1.xmirror(0);
+	console.log(edge1.history.length);
 	
-	edge2 = makeBoxEdge(width, tabs, gender, thickness, bitDiameter);
+	edge2 = makeBoxEdge(width, tabs, gender, thickness, bitDiameter, true);
+	console.log(edge2.history.length)
 	edge2.pivot(0,0,Math.PI/2.0);
-	edge2.xmirror(0);
-	edge2.translate(length-2*thickness, 0);
+	edge2.translate(length+bitDiameter, 0);
 	edge2.reverse();
+	console.log(edge2.history.length)
 
 	box = new Turtle2D();
+	box.abs(edge1.history[0].x, edge1.history[0].y)
 
-	for(i in edge1.history) {
-		p = edge1.history[i];
-		box.abs(p.x,p.y);
-	}
+	console.log(edge1.history.length)
+	box.extend(edge1);
+	console.log(box.history.length)
 
 	box.rel(dx/2.0 - tabWidth/2.0 - bitDiameter/2.0, 0);
 	box.mark();
 	box.rel(tabWidth, 0);
 	box.unmark();
 
-	for(i in edge2.history) {
-		p = edge2.history[i];
-		box.abs(p.x,p.y);
-	}
+
+	box.extend(edge2);
 
 	box.rel(-(dx/2.0 - tabWidth/2.0 - bitDiameter/2.0), 0);
 	box.mark();
@@ -330,7 +343,7 @@ var generateGCodeList = function(turtle, totalDepth, depthPerPass, feedRate, plu
 		if(!loop) {
 			retval.push('(Pull up and rapid to start)');
 			retval.push('G0 Z' + safeZ.toFixed(3));	
-			retval.push('G0 X' + turtle.history[0].x.toFixed(5) + ' Y' + turtle.history[0].toFixed(5));			
+			retval.push('G0 X' + turtle.history[0].x.toFixed(5) + ' Y' + turtle.history[0].y.toFixed(5));			
 		}
 	}
 

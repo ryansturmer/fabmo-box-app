@@ -12,18 +12,34 @@
 	var materialThickness = 0.4;
 	var boxLength = 6.0;
 	var boxWidth = 3.0;
-	var boxTabs = 2;
+	var boxTabs = 4;
 	var bitDiameter = 0.125;
 	var feedRate = 120.0;
 	var plungeRate = 30.0;
 	var safeZ = 0.5;
 	var tabWidth = 0.125;
 	var tabThickness = 0.125;
+	var gender = GENDER_MALE;
+	
+	edge = makeBoxEdge(boxWidth, boxTabs, gender, materialThickness, bitDiameter, true);
 
-	slot = makeSlot(0.5,1,0.125)
-	edge = makeBoxEdge(4, 4, GENDER_MALE, 0.375, 0.125)
+	side = makeBoxSide(boxLength, boxWidth, boxTabs, gender, materialThickness, bitDiameter, tabWidth);
+
+	gCodeList = generateGCodeList(side,-materialThickness - 0.010, 0.75*bitDiameter, feedRate, plungeRate, safeZ, 0.3);
+	gcode = gCodeList.join('\n');
+
+	var genderName = gender === GENDER_MALE ? 'Male' : 'Female';
+
+	fabmoDashboard.submitJob(gCodeList.join('\n'), {
+								filename : 'box_' +  (gender === GENDER_MALE ? 'male' : 'female') + '.nc',
+                      			name : 'Box Jointed Panel ' + boxLength.toFixed(2) + '"x' + boxWidth.toFixed(2) + '" (' + genderName + ')'
+                      		});
+
+	side.translateToOrigin();
+
 	preview = new CanvasPreview('canvas');
-	preview.draw(edge);
+	preview.draw(side);
+
 </script>
 
 </html>

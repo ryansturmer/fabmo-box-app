@@ -34,16 +34,19 @@ CanvasPreview.prototype.draw = function(turtle) {
 	var context = this.context;
 
 	context.beginPath();
+	context.strokeStyle = 'gray';
 	context.moveTo(scaleX(0), 0);
 	context.lineTo(scaleX(0), canvasHeight);
 	context.stroke();
 
 	context.beginPath();
+	context.strokeStyle = 'gray';
 	context.moveTo(0, scaleY(0));
 	context.lineTo(canvasWidth, scaleY(0));
 	context.stroke();
 
 	context.beginPath();
+	context.strokeStyle = 'black';
     context.moveTo(scaleX(turtle.history[0].x), scaleY(turtle.history[0].y));
 
 	for(i in turtle.history) {

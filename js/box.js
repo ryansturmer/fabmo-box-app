@@ -194,7 +194,7 @@ var makeBoxEdge = function(width, tabs, gender, thickness, bitDiameter) {
 	if(gender === GENDER_MALE) {
 		retval.rel(segLength+bitRadius, 0);
 		retval.reverse();
-		retval.rel(-segLength+bitRadius, 0);
+		retval.rel(-segLength-bitRadius, 0);
 		retval.reverse();
 	} else {
 		retval.trim(3);

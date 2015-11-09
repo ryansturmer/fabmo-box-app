@@ -167,8 +167,8 @@
 	        	gCodeList = generateGCodeList(side,-options.material_thickness - 0.010, 0.75*bitDiameter, feedRate, plungeRate, safeZ, 0.3);
 				gcode = gCodeList.join('\n');
 				fabmoDashboard.submitJob(gCodeList.join('\n'), {
-											filename : 'box_' +  (gender === GENDER_MALE ? 'male' : 'female') + '.nc',
-			                      			name : 'Box Jointed Panel ' + boxLength.toFixed(2) + '"x' + boxWidth.toFixed(2) + '" (' + genderName + ')'
+											filename : 'box_' +  (options.gender === GENDER_MALE ? 'male' : 'female') + '.nc',
+			                      			name : 'Box Jointed Panel ' + options.box_length.toFixed(2) + '"x' + options.box_depth.toFixed(2) + '" (' + genderName + ')'
 			                      		});
 			}
 		});

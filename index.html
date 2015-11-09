@@ -63,11 +63,20 @@
                 </div>
               </div>
             </div>
-
             <div class="form-group">
-              <label for="input-resolution" class="col-sm-6 control-label">Number of Fingers</label>
+              <label for="input-fingers" class="col-sm-6 control-label">Number of Fingers</label>
               <div class="col-sm-6">
                   <input class="form-control num-input update" id="input-fingers" value="4" type="number" min="2" max="100" step="1">
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label for="input-gender" class="col-sm-6 control-label">Gender</label>
+              <div class="col-sm-6">
+        		<select class="form-control update" id="input-gender">
+  					<option>Male</option>
+  					<option>Female</option>
+				</select>    
               </div>
             </div>
 
@@ -94,6 +103,8 @@
 		var tabThickness = 0.125;
 		var gender = GENDER_MALE;
 		var side;
+		var options;
+
         function getOptions() {
             // Extract options from the form
             var options = {}
@@ -101,6 +112,8 @@
               var id = this.id.replace(/input-/gi, '');
               options[id] = Number(this.value);
             });
+            options.gender = $('#input-gender').val() === "Male" ? GENDER_MALE : GENDER_FEMALE;
+            console.log(options)
             return options
         }
 
@@ -109,9 +122,9 @@
         });
 
         function update() {
-            var options = getOptions();
+            options = getOptions();
             try {
-		  		side = makeBoxSide(options.box_length, options.box_depth, options.fingers, gender, options.material_thickness, bitDiameter, tabWidth);
+		  		side = makeBoxSide(options.box_length, options.box_depth, options.fingers, options.gender, options.material_thickness, bitDiameter, tabWidth);
 				side.translateToOrigin();            	
             	ok();
             } catch(e) {
@@ -150,6 +163,7 @@
 		$('#btn-cut').click( function() {
 			update();
 			if(side) {			
+				var genderName = options.gender === GENDER_MALE ? 'male' : 'female';
 	        	gCodeList = generateGCodeList(side,-options.material_thickness - 0.010, 0.75*bitDiameter, feedRate, plungeRate, safeZ, 0.3);
 				gcode = gCodeList.join('\n');
 				fabmoDashboard.submitJob(gCodeList.join('\n'), {

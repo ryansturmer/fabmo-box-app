@@ -225,29 +225,26 @@ var midpoint = function(a, b) {
 }
 
 var makeBoxSide = function(length, width, tabs, gender, thickness, bitDiameter, tabWidth) {
+	if((thickness) >= (length/2-bitDiameter)) {
+		throw new Error("Material thickness is too large (or box size is too small) to make this box");
+	}
+
 	var dx = length-2*thickness;
 
 	edge1 = makeBoxEdge(width, tabs, gender, thickness, bitDiameter, true);
-	console.log(edge1.history.length);
 	edge1.pivot(0,0,Math.PI/2.0);
-	console.log(edge1.history.length);
 
 	edge1.xmirror(0);
-	console.log(edge1.history.length);
 	
 	edge2 = makeBoxEdge(width, tabs, gender, thickness, bitDiameter, true);
-	console.log(edge2.history.length)
 	edge2.pivot(0,0,Math.PI/2.0);
 	edge2.translate(length+bitDiameter, 0);
 	edge2.reverse();
-	console.log(edge2.history.length)
 
 	box = new Turtle2D();
 	box.abs(edge1.history[0].x, edge1.history[0].y)
 
-	console.log(edge1.history.length)
 	box.extend(edge1);
-	console.log(box.history.length)
 
 	box.rel(dx/2.0 - tabWidth/2.0 - bitDiameter/2.0, 0);
 	box.mark();

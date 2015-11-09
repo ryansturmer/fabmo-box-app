@@ -1,7 +1,7 @@
 var CanvasPreview = function(id) {
 	this.id = id;
 	this.canvas = document.getElementById(id);
-	this.context = canvas.getContext('2d');
+	this.context = this.canvas.getContext('2d');
 }
 
 CanvasPreview.prototype.draw = function(turtle) {
@@ -34,13 +34,13 @@ CanvasPreview.prototype.draw = function(turtle) {
 	var context = this.context;
 
 	context.beginPath();
-	context.strokeStyle = 'gray';
+	context.strokeStyle = 'lightgray';
 	context.moveTo(scaleX(0), 0);
 	context.lineTo(scaleX(0), canvasHeight);
 	context.stroke();
 
 	context.beginPath();
-	context.strokeStyle = 'gray';
+	context.strokeStyle = 'lightgray';
 	context.moveTo(0, scaleY(0));
 	context.lineTo(canvasWidth, scaleY(0));
 	context.stroke();
@@ -53,10 +53,6 @@ CanvasPreview.prototype.draw = function(turtle) {
 		p = turtle.history[i];
 		context.lineTo(scaleX(p.x), scaleY(p.y))
 	}
-
-	var b = turtle.bounds()
-	console.log("Width: " + (b.xmax-b.xmin))
-	console.log("Height: " + (b.ymax-b.ymin))
 
 	context.stroke();
 }

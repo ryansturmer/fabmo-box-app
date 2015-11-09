@@ -1,45 +1,167 @@
-<html>
-<div id="output">
-<script src="js/lib/jquery.min.js"></script>
-<script src="js/lib/dashboard.js"></script>
-<script src="js/box.js"></script>
-<script src="js/preview.js"></script>
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>BoxCutter</title>
+    <link href="css/bootstrap.min.css" rel="stylesheet">
+    <link href="css/style.css" rel="stylesheet">
+  </head>
+  <body>
 
-<body>
-<canvas id="canvas" width="800" height="800" style="border: 1px solid black;"></canvas>
+    <div class="container-fluid">
+      <!-- Title/description -->
+      <div style="text-align:center;">
+        <h1>BoxCutter</h1>
+      </div>
+      
+      <!-- Viewport for 3D view -->
+      <div class="row">
+      
+      <div class="col-sm-7 col-sm-push-5" style="margin-left: auto; margin-right: auto; ">
+      	<div id="viewport-container">
+        	<canvas id="viewport"></canvas>
+        </div>
+        
+	    <div class="alert alert-danger" id="alert" style="margin: 10px;"></div>
 
-<script type="text/javascript">
-	var materialThickness = 0.4;
-	var boxLength = 6.0;
-	var boxWidth = 3.0;
-	var boxTabs = 4;
-	var bitDiameter = 0.125;
-	var feedRate = 120.0;
-	var plungeRate = 30.0;
-	var safeZ = 0.5;
-	var tabWidth = 0.125;
-	var tabThickness = 0.125;
-	var gender = GENDER_MALE;
-	
-	edge = makeBoxEdge(boxWidth, boxTabs, gender, materialThickness, bitDiameter, true);
+        <div style="margin:20px; text-align: right;">
+          	<button class="btn btn-lg btn-success" id="btn-cut">
+       		Cut <span class="glyphicon glyphicon-wrench" aria-hidden="true"></span>
+          	</button>
+        </div>
+      </div>
 
-	side = makeBoxSide(boxLength, boxWidth, boxTabs, gender, materialThickness, bitDiameter, tabWidth);
+      <!-- Form for input -->
+        <div class="col-sm-5 col-sm-pull-7">
+          <form class="form-horizontal" id="form-params">
+            <div class="form-group">
+              <label for="input-width" class="col-sm-6 control-label">Box Length</label>
+              <div class="col-sm-6">
+                <div class="input-group">
+                  <input class="form-control num-input update" id="input-box_length" type="number" min="0.25" max="1000.0" value="4" step="0.25">
+                  <span class="input-group-addon">in</span>
+                </div>
+              </div>
+            </div>
+            <div class="form-group">
+              <label for="input-material_thickness" class="col-sm-6 control-label">Box Depth</label>
+              <div class="col-sm-6">
+                <div class="input-group">
+                  <input class="form-control num-input update" id="input-box_depth" value="2" step="0.25" type="number" min="0.0625" max="1000.0">
+                  <span class="input-group-addon">in</span>
+                </div>
+              </div>
+            </div>
+            <div class="form-group">
+              <label for="input-material_thickness" class="col-sm-6 control-label">Material Thickness</label>
+              <div class="col-sm-6">
+                <div class="input-group">
+                  <input class="form-control num-input update" id="input-material_thickness" value="0.25" step="0.05" type="number" min="0.03125" max="6.0">
+                  <span class="input-group-addon">in</span>
+                </div>
+              </div>
+            </div>
 
-	gCodeList = generateGCodeList(side,-materialThickness - 0.010, 0.75*bitDiameter, feedRate, plungeRate, safeZ, 0.3);
-	gcode = gCodeList.join('\n');
+            <div class="form-group">
+              <label for="input-resolution" class="col-sm-6 control-label">Number of Fingers</label>
+              <div class="col-sm-6">
+                  <input class="form-control num-input update" id="input-fingers" value="4" type="number" min="2" max="100" step="1">
+              </div>
+            </div>
 
-	var genderName = gender === GENDER_MALE ? 'Male' : 'Female';
+          </form>
+        </div>
+      </div>
+    </div>
 
-	fabmoDashboard.submitJob(gCodeList.join('\n'), {
-								filename : 'box_' +  (gender === GENDER_MALE ? 'male' : 'female') + '.nc',
-                      			name : 'Box Jointed Panel ' + boxLength.toFixed(2) + '"x' + boxWidth.toFixed(2) + '" (' + genderName + ')'
-                      		});
+    <!-- Dependencies -->
+    <script src="js/lib/jquery.min.js"></script>
+    <script src="js/bootstrap.min.js"></script>
+    <script src="js/box.js"></script>
+    <script src="js/preview.js"></script>
+    <script src="js/lib/dashboard.js"></script>
 
-	side.translateToOrigin();
+    <script> 
+		var materialThickness = 0.4;
+		var boxTabs = 4;
+		var bitDiameter = 0.125;
+		var feedRate = 120.0;
+		var plungeRate = 30.0;
+		var safeZ = 0.5;
+		var tabWidth = 0.125;
+		var tabThickness = 0.125;
+		var gender = GENDER_MALE;
+		var side;
+        function getOptions() {
+            // Extract options from the form
+            var options = {}
+            $('#form-params').find('input').each(function(){
+              var id = this.id.replace(/input-/gi, '');
+              options[id] = Number(this.value);
+            });
+            return options
+        }
 
-	preview = new CanvasPreview('canvas');
-	preview.draw(side);
+        $('.update').change(function(evt) {
+          update();
+        });
 
-</script>
+        function update() {
+            var options = getOptions();
+            try {
+		  		side = makeBoxSide(options.box_length, options.box_depth, options.fingers, gender, options.material_thickness, bitDiameter, tabWidth);
+				side.translateToOrigin();            	
+            	ok();
+            } catch(e) {
+            	error(e);
+            	side = null;
+            	console.error(e);
+            }
+          	redraw();
+        }
 
+		preview = new CanvasPreview('viewport');
+
+		function redraw() {
+			container = document.getElementById('viewport-container');
+			preview.canvas.width = container.offsetWidth;
+			preview.canvas.height = container.offsetHeight;	
+			if(side) {
+        		preview.draw(side);
+			}
+		}
+		window.addEventListener('resize', function(evt) {
+        	redraw();
+        });
+
+        function error(msg) {
+        	$('#alert').show();
+        	$('#alert').addClass('alert-danger');
+        	$('#alert').text(msg);
+        }
+
+        function ok() {
+        	$('#alert').hide();        
+        }
+
+
+		$('#btn-cut').click( function() {
+			update();
+			if(side) {			
+	        	gCodeList = generateGCodeList(side,-options.material_thickness - 0.010, 0.75*bitDiameter, feedRate, plungeRate, safeZ, 0.3);
+				gcode = gCodeList.join('\n');
+				fabmoDashboard.submitJob(gCodeList.join('\n'), {
+											filename : 'box_' +  (gender === GENDER_MALE ? 'male' : 'female') + '.nc',
+			                      			name : 'Box Jointed Panel ' + boxLength.toFixed(2) + '"x' + boxWidth.toFixed(2) + '" (' + genderName + ')'
+			                      		});
+			}
+		});
+        update();
+
+
+    </script>
+
+  </body>
 </html>

@@ -1,181 +1,246 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="utf-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>BoxCutter</title>
-    <link href="css/bootstrap.min.css" rel="stylesheet">
-    <link href="css/style.css" rel="stylesheet">
-  </head>
-  <body>
+	<head>
+		<meta charset="utf-8">
+		<meta http-equiv="X-UA-Compatible" content="IE=edge">
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+		<title>BoxCutter</title>
+		<link href="css/bootstrap.min.css" rel="stylesheet">
+		<link href="css/style.css" rel="stylesheet">
+	</head>
+	<body>
 
-    <div class="container-fluid">
-      <!-- Title/description -->
-      <div style="text-align:center;">
-        <h1>BoxCutter</h1>
-      </div>
-      
-      <!-- Viewport for 3D view -->
-      <div class="row">
-      
-      <div class="col-sm-7 col-sm-push-5" style="margin-left: auto; margin-right: auto; ">
-      	<div id="viewport-container">
-        	<canvas id="viewport"></canvas>
-        </div>
-        
-	    <div class="alert alert-danger" id="alert" style="margin: 10px;"></div>
+		<div class="container-fluid">
+			<!-- Title/description -->
+			<div style="text-align:center;">
+				<h1>BoxCutter</h1>
+			</div>
+			
+			<!-- Viewport for 3D view -->
+		<div class="row">  
+			<div class="col-sm-7 col-sm-push-5" style="margin-left: auto; margin-right: auto; ">
+				<div id="viewport-container">
+					<canvas id="viewport"></canvas>
+				</div>
+				
+				<!-- Alert Box -->
+				<div class="alert alert-danger" id="alert" style="margin: 10px;"></div>
 
-        <div style="margin:20px; text-align: right;">
-          	<button class="btn btn-lg btn-success" id="btn-cut">
-       		Cut <span class="glyphicon glyphicon-wrench" aria-hidden="true"></span>
-          	</button>
-        </div>
-      </div>
+				<!-- Buttons -->
+				<div style="margin:20px; text-align: right;">
+						<button class="btn btn-lg btn-success" id="btn-cut">
+					Cut <span class="glyphicon glyphicon-wrench" aria-hidden="true"></span>
+						</button>
+				</div>
+			</div>
 
-      <!-- Form for input -->
-        <div class="col-sm-5 col-sm-pull-7">
-          <form class="form-horizontal" id="form-params">
-            <div class="form-group">
-              <label for="input-width" class="col-sm-6 control-label">Box Length</label>
-              <div class="col-sm-6">
-                <div class="input-group">
-                  <input class="form-control num-input update" id="input-box_length" type="number" min="0.25" max="1000.0" value="4" step="0.25">
-                  <span class="input-group-addon">in</span>
-                </div>
-              </div>
-            </div>
-            <div class="form-group">
-              <label for="input-material_thickness" class="col-sm-6 control-label">Box Depth</label>
-              <div class="col-sm-6">
-                <div class="input-group">
-                  <input class="form-control num-input update" id="input-box_depth" value="2" step="0.25" type="number" min="0.0625" max="1000.0">
-                  <span class="input-group-addon">in</span>
-                </div>
-              </div>
-            </div>
-            <div class="form-group">
-              <label for="input-material_thickness" class="col-sm-6 control-label">Material Thickness</label>
-              <div class="col-sm-6">
-                <div class="input-group">
-                  <input class="form-control num-input update" id="input-material_thickness" value="0.25" step="0.05" type="number" min="0.03125" max="6.0">
-                  <span class="input-group-addon">in</span>
-                </div>
-              </div>
-            </div>
-            <div class="form-group">
-              <label for="input-fingers" class="col-sm-6 control-label">Number of Fingers</label>
-              <div class="col-sm-6">
-                  <input class="form-control num-input update" id="input-fingers" value="4" type="number" min="2" max="100" step="1">
-              </div>
-            </div>
+		<div class="col-sm-5 col-sm-pull-7">
+		
+			<!-- Settings Tabs -->
+			<ul class="nav nav-tabs" style="margin-bottom: 20px;" role="tablist">
+				<li role="presentation" class="active"><a href="#boxdims" aria-controls="boxdims" role="tab" data-toggle="tab">Box Dimensions</a></li>
+				<li role="presentation"><a href="#toolsettings" aria-controls="toolsettings" role="tab" data-toggle="tab">Machining Settings</a></li>
+			</ul>
 
-            <div class="form-group">
-              <label for="input-gender" class="col-sm-6 control-label">Gender</label>
-              <div class="col-sm-6">
-        		<select class="form-control update" id="input-gender">
-  					<option>Male</option>
-  					<option>Female</option>
-				</select>    
-              </div>
-            </div>
+			<!-- Box Dimensions Tab -->
+			<div class="tab-content">
+				<div role="tabpanel" class="tab-pane active" id="boxdims">
+					<form class="form-horizontal" id="boxdims-form">
+						<div class="form-group">
+							<label for="input-width" class="col-sm-6 control-label">Box Length</label>
+							<div class="col-sm-6">
+								<div class="input-group">
+									<input class="form-control num-input update" id="input-box_length" type="number" min="0.25" max="1000.0" value="4" step="0.25">
+									<span class="input-group-addon">in</span>
+								</div>
+							</div>
+						</div>
+						<div class="form-group">
+							<label for="input-material_thickness" class="col-sm-6 control-label">Box Depth</label>
+							<div class="col-sm-6">
+								<div class="input-group">
+									<input class="form-control num-input update" id="input-box_depth" value="2" step="0.25" type="number" min="0.0625" max="1000.0">
+									<span class="input-group-addon">in</span>
+								</div>
+							</div>
+						</div>
+						<div class="form-group">
+							<label for="input-material_thickness" class="col-sm-6 control-label">Material Thickness</label>
+							<div class="col-sm-6">
+								<div class="input-group">
+									<input class="form-control num-input update" id="input-material_thickness" value="0.25" step="0.05" type="number" min="0.03125" max="6.0">
+									<span class="input-group-addon">in</span>
+								</div>
+							</div>
+						</div>
+						<div class="form-group">
+							<label for="input-fingers" class="col-sm-6 control-label">Number of Fingers</label>
+							<div class="col-sm-6">
+									<input class="form-control num-input update" id="input-fingers" value="4" type="number" min="2" max="100" step="1">
+							</div>
+						</div>
+						<div class="form-group">
+							<label for="input-gender" class="col-sm-6 control-label">Gender</label>
+							<div class="col-sm-6">
+								<select class="form-control update" id="input-gender">
+									<option>Male</option>
+									<option>Female</option>
+								</select>    
+							</div>
+						</div>
+					</form>
+				</div> <!-- tabpanel -->
 
-          </form>
-        </div>
-      </div>
-    </div>
+				<!-- Tool Settings Tab -->
+				<div role="tabpanel" class="tab-pane" id="toolsettings">
+					<form class="form-horizontal" id="toolsettings-form">
+						<div class="form-group">
+							<label for="input-width" class="col-sm-6 control-label">Bit Diameter</label>
+							<div class="col-sm-6">
+								<div class="input-group">
+									<input class="form-control num-input update" id="input-bit_diameter" type="number" min="0.03125" max="2.0" value="0.125" step="0.03125">
+									<span class="input-group-addon">in</span>
+								</div>
+							</div>
+						</div>
 
-    <!-- Dependencies -->
-    <script src="js/lib/jquery.min.js"></script>
-    <script src="js/bootstrap.min.js"></script>
-    <script src="js/box.js"></script>
-    <script src="js/preview.js"></script>
-    <script src="js/lib/dashboard.js"></script>
+						<div class="form-group">
+							<label for="input-width" class="col-sm-6 control-label">Tab Width</label>
+							<div class="col-sm-6">
+								<div class="input-group">
+									<input class="form-control num-input update" id="input-tab_width" type="number" min="0" max="2.0" value="0.125" step="0.0625">
+									<span class="input-group-addon">in</span>
+								</div>
+							</div>
+						</div>
 
-    <script> 
-		var materialThickness = 0.4;
-		var boxTabs = 4;
-		var bitDiameter = 0.125;
-		var feedRate = 120.0;
-		var plungeRate = 30.0;
-		var safeZ = 0.5;
-		var tabWidth = 0.125;
-		var tabThickness = 0.125;
-		var gender = GENDER_MALE;
-		var side;
-		var options;
+						<div class="form-group">
+							<label for="input-width" class="col-sm-6 control-label">Safe Z</label>
+							<div class="col-sm-6">
+								<div class="input-group">
+									<input class="form-control num-input update" id="input-safe_z" type="number" min="0" max="1000.0" value="0.5" step="0.25">
+									<span class="input-group-addon">in</span>
+								</div>
+							</div>
+						</div>
 
-        function getOptions() {
-            // Extract options from the form
-            var options = {}
-            $('#form-params').find('input').each(function(){
-              var id = this.id.replace(/input-/gi, '');
-              options[id] = Number(this.value);
-            });
-            options.gender = $('#input-gender').val() === "Male" ? GENDER_MALE : GENDER_FEMALE;
-            console.log(options)
-            return options
-        }
+						<div class="form-group">
+							<label for="input-width" class="col-sm-6 control-label">Feedrate</label>
+							<div class="col-sm-6">
+								<div class="input-group">
+									<input class="form-control num-input update" id="input-feed_rate" type="number" min="0.0001" max="10.0" value="2.0" step="0.25">
+									<span class="input-group-addon">in/sec</span>
+								</div>
+							</div>
+						</div>
 
-        $('.update').change(function(evt) {
-          update();
-        });
+						<div class="form-group">
+							<label for="input-width" class="col-sm-6 control-label">Safe Z</label>
+							<div class="col-sm-6">
+								<div class="input-group">
+									<input class="form-control num-input update" id="input-plunge_rate" type="number" min="0.0001" max="1000.0" value="0.5" step="0.25">
+									<span class="input-group-addon">in</span>
+								</div>
+							</div>
+						</div>
 
-        function update() {
-            options = getOptions();
-            try {
-		  		side = makeBoxSide(options.box_length, options.box_depth, options.fingers, options.gender, options.material_thickness, bitDiameter, tabWidth);
-				side.translateToOrigin();            	
-            	ok();
-            } catch(e) {
-            	error(e);
-            	side = null;
-            	console.error(e);
-            }
-          	redraw();
-        }
+					</form>
+				</div> <!-- tabpanel -->
 
-		preview = new CanvasPreview('viewport');
+			</div> <!-- tab-content -->
+		</div>
+	</div>
+			</div>
 
-		function redraw() {
-			container = document.getElementById('viewport-container');
-			preview.canvas.width = container.offsetWidth;
-			preview.canvas.height = container.offsetHeight;	
-			if(side) {
-        		preview.draw(side);
+
+		<!-- Dependencies -->
+		<script src="js/lib/jquery.min.js"></script>
+		<script src="js/bootstrap.min.js"></script>
+		<script src="js/box.js"></script>
+		<script src="js/preview.js"></script>
+		<script src="js/lib/dashboard.js"></script>
+
+		<script> 
+			var side;
+			var options;
+
+			function getOptions() {
+					// Extract options from the form
+					var options = {}
+					$('#boxdims-form').find('input').each(function(){
+						var id = this.id.replace(/input-/gi, '');
+						options[id] = Number(this.value);
+					});
+
+					$('#toolsettings-form').find('input').each(function(){
+						var id = this.id.replace(/input-/gi, '');
+						options[id] = Number(this.value);
+					});
+
+					options.gender = $('#input-gender').val() === "Male" ? GENDER_MALE : GENDER_FEMALE;
+					
+					console.log(options)
+					return options
 			}
-		}
-		window.addEventListener('resize', function(evt) {
-        	redraw();
-        });
 
-        function error(msg) {
-        	$('#alert').show();
-        	$('#alert').addClass('alert-danger');
-        	$('#alert').text(msg);
-        }
+			$('.update').change(function(evt) {
+				update();
+			});
 
-        function ok() {
-        	$('#alert').hide();        
-        }
+			function update() {
+					options = getOptions();
+					try {
+						side = makeBoxSide(options.box_length, options.box_depth, options.fingers, options.gender, options.material_thickness, options.bit_diameter, options.tab_width);
+						side.translateToOrigin();            	
+						ok();
+					} catch(e) {
+						error(e);
+						side = null;
+						console.error(e);
+					}
+					redraw();
+			}
+
+			preview = new CanvasPreview('viewport');
+
+			function redraw() {
+				container = document.getElementById('viewport-container');
+				preview.canvas.width = container.offsetWidth;
+				preview.canvas.height = container.offsetHeight;	
+				if(side) {
+							preview.draw(side);
+				}
+			}
+
+			window.addEventListener('resize', function(evt) {
+				redraw();
+			});
+
+			function error(msg) {
+				$('#alert').show();
+				$('#alert').addClass('alert-danger');
+				$('#alert').text(msg);
+			}
+
+			function ok() {
+				$('#alert').hide();        
+			}
 
 
-		$('#btn-cut').click( function() {
+			$('#btn-cut').click( function() {
+				update();
+				if(side) {			
+					var genderName = options.gender === GENDER_MALE ? 'male' : 'female';
+							gCodeList = generateGCodeList(side,-options.material_thickness - 0.010, 0.75*options.bit_diameter, 60*options.feed_rate, 60*options.plunge_rate, safeZ, 0.3);
+					gcode = gCodeList.join('\n');
+					fabmoDashboard.submitJob(gCodeList.join('\n'), {
+												filename : 'box_' +  (options.gender === GENDER_MALE ? 'male' : 'female') + '.nc',
+																		name : 'Box Jointed Panel ' + options.box_length.toFixed(2) + '"x' + options.box_depth.toFixed(2) + '" (' + genderName + ')'
+																	});
+				}
+			});
 			update();
-			if(side) {			
-				var genderName = options.gender === GENDER_MALE ? 'male' : 'female';
-	        	gCodeList = generateGCodeList(side,-options.material_thickness - 0.010, 0.75*bitDiameter, feedRate, plungeRate, safeZ, 0.3);
-				gcode = gCodeList.join('\n');
-				fabmoDashboard.submitJob(gCodeList.join('\n'), {
-											filename : 'box_' +  (options.gender === GENDER_MALE ? 'male' : 'female') + '.nc',
-			                      			name : 'Box Jointed Panel ' + options.box_length.toFixed(2) + '"x' + options.box_depth.toFixed(2) + '" (' + genderName + ')'
-			                      		});
-			}
-		});
-        update();
+		</script>
 
-
-    </script>
-
-  </body>
+	</body>
 </html>

@@ -187,7 +187,7 @@ var makeBoxEdge = function(width, tabs, gender, thickness, bitDiameter, dogbone)
 	}
 
 	if(segLength < bitDiameter) {
-		throw new Error("Cannot do this many tabs.  Pocket width (" + segLength.toFixed(3) + ") is less than the bit diameter (" + bitDiameter.toFixed(3) + ").")
+		throw new Error("Cannot do this many fingers.  Pocket width (" + segLength.toFixed(3) + ") is less than the bit diameter (" + bitDiameter.toFixed(3) + ").")
 	}
 
 	retval = new Turtle2D();

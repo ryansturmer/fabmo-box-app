@@ -210,12 +210,10 @@ var makeGCodeSetup = function(safeZ) {
 
 var makeGCodeTeardown = function(safeZ) {
 	retval = [];
-	retval.push('(Pull out material)')
+	retval.push('(Pull out of material)')
 	retval.push('G0 Z' + safeZ.toFixed(3));
-	retval.push('(Spindle off and wait for spin-down)')
+	retval.push('(Spindle off and go home)')
 	retval.push('M8');
-	retval.push('G4 P3');
-	retval.push('(Go Home)');
 	retval.push('G0 X0 Y0');
 	retval.push('(End Program)');
 	retval.push('M30');
@@ -249,6 +247,7 @@ var makeGCodeFromTurtle = function(turtle, totalDepth, depthPerPass, feedRate, p
 	while(1) {
 		// Plunge
 		retval.push('(Plunge)');
+		retva.push('G0Z0'); // Rapid to surface of material, since plunges are generally slow
 		retval.push('G1 Z' + depth.toFixed(5) + 'F' + plungeRate);
 
 		// Cut contour
@@ -256,16 +255,20 @@ var makeGCodeFromTurtle = function(turtle, totalDepth, depthPerPass, feedRate, p
 		var cutting_tab = false;
 		for(var i=0; i<turtle.history.length; i++) {
 			p = turtle.history[i];
+
+			// Pull up if we hit a tab
 			if(p.mark && !cutting_tab) {
 				cutting_tab = true;
 				if(depth < tabDepth) {
-					retval.push('G1 Z' + tabDepth.toFixed(5) + ' F' + plungeRate);
+					retval.push('G0 Z' + tabDepth.toFixed(5)); // Rapid because we're pulling out of the material
 				}
 			}
+
+			// Plunge back to depth if we're done with a tab
 			if(cutting_tab && !p.mark) {
 				cutting_tab = false;
 				if(depth < tabDepth) {
-					retval.push('G1 Z' + depth + ' F' + plungeRate);
+					retval.push('G0 Z' + depth + ' F' + plungeRate); // Plunge rate because we're plunging
 				}				
 			}
 			retval.push('G1 X' + p.x.toFixed(5) + ' Y' + p.y.toFixed(5) + ' F' + feedRate);

@@ -6,134 +6,48 @@ DIRECTION_VERT = 1;
 
 EPS = 0.0001;
 
-var Turtle2D = function() {
-	this.pos = {x:0,y:0};
-	this.history = [];
-	this._mark = false;
+Array.prototype.extend = function (other_array) {
+    other_array.forEach(function(v) {this.push(v)}, this);    
 }
 
-Turtle2D.prototype.reverse = function() {
-	this.history.reverse();
-	this.pos = this.history[this.history.length-1];
+var equals = function(a,b) {
+	return Math.abs(a-b) < EPS;
 }
 
-Turtle2D.prototype.setPos = function(x,y) {
-	this.pos = {'x':x, 'y':y};
-}
+var makePocket = function(startX, startY, xLength, yLength, bitDiameter) {
+	var height = yLength;
+	var width = xLength;
+	var bitRadius = bitDiameter/2.0;
 
-Turtle2D.prototype.abs = function(x,y,mark) {
-	this.setPos(x,y);
-	if(this._mark || mark) {
-		this.pos.mark = true;
+	if(bitDiameter > height || bitDiameter > width) {
+		throw new Error("Slot too narrow/short to cut with a " + bitDiameter.toFixed(3) + " bit.")
 	}
-	if(this.history.length > 0) {
-		var p = this.history[this.history.length-1];
-		if(p.x != x || p.y != y) {
-			this.history.push(this.pos);
-		}
-	} else {		
-			this.history.push(this.pos);
+
+	ybot = startY + bitRadius;
+	ytop = startY + yLength-bitRadius;
+	xleft = startX + bitRadius;
+	xright = startX + xLength-bitRadius;
+
+	ymid = (ytop-ybot)/2.0;
+	xmid = (xright-xleft)/2.0;
+
+	t = new Turtle2D();
+	t.setPos(xleft,ybot);
+	t.rel(0,0)
+	while(true) {
+		t.abs(xright,ybot);
+		ybot = Math.min(ybot + bitDiameter, startY + yLength-bitRadius);
+		t.abs(xright,ytop);
+		xright = Math.max(xright - bitDiameter, startX + bitRadius);		
+		t.abs(xleft,ytop);
+		ytop = Math.max(ytop - bitDiameter, startY + bitRadius);
+		t.abs(xleft,ybot);
+		xleft = Math.min(xleft + bitDiameter, startX + xLength-bitRadius);
+
+		if(Math.abs(t.pos.x - xmid) <= bitDiameter) {break;}
+		if(Math.abs(t.pos.y - ymid) <= bitDiameter) {break;}
 	}
-}
-
-Turtle2D.prototype.rel = function(dx, dy) {
-	this.abs(this.pos.x + dx, this.pos.y + dy);
-}
-
-
-Turtle2D.prototype.translate = function(dx, dy) {
-	var dx = dx || 0.0;
-	var dy = dy || 0.0;
-	for(var i in this.history) {
-		this.history[i].x += dx;
-		this.history[i].y += dy;
-	}
-}
-
-Turtle2D.prototype.pivot = function(cx,cy, angle) {
-	var s = Math.sin(angle);
-	var c = Math.cos(angle);
-	for(var i in this.history) {
-		var p = this.history[i];
-		p.x -= cx;
-		p.y -= cy;
-		var nx = (p.x*c - p.y*s);
-		var ny = (p.x*s + p.y*c);
-		p.x = nx + cx;
-		p.y = ny + cy;
-	}
-}
-
-Turtle2D.prototype.xmirror = function(x) {
-	var x = x || 0;
-	for(var i in this.history) {
-		var p = this.history[i];
-		p.x = -(p.x - x) + x;
-	}	
-}
-
-Turtle2D.prototype.ymirror = function(y) {
-	var y = y || 0;
-	for(var i in this.history) {
-		var p = this.history[i];
-		p.y = -(p.y - y) + y;
-	}	
-}
-
-Turtle2D.prototype.pretty = function(precision) {
-	retval = [];
-	precision = precision || 3;
-
-	for(i in this.history) {
-		p = this.history[i];
-		retval.push('<p>' + p.x.toFixed(precision) + ',' + p.y.toFixed(precision) + '</p>');
-	}
-	return retval.join('');
-}
-
-Turtle2D.prototype.ltrim = function(count) {
-	this.history.splice(0, count);
-}
-
-Turtle2D.prototype.rtrim = function(count) {
-	this.history.splice(-count, count);
-	this.pos = this.history[this.history.length-1];
-}
-
-Turtle2D.prototype.trim = function(count) {
-	this.ltrim(count);
-	this.rtrim(count);
-}
-
-Turtle2D.prototype.mark = function() {
-	this._mark = true;
-}
-
-Turtle2D.prototype.unmark = function() {
-	this._mark = false;
-}
-
-Turtle2D.prototype.bounds = function() {
-	var retval = {xmin : this.pos.x, xmax : this.pos.x, ymin : this.pos.y, ymax : this.pos.y}
-	for(i in this.history) {
-		p = this.history[i];
-		retval.xmax = Math.max(p.x, retval.xmax);
-		retval.xmin = Math.min(p.x, retval.xmin);
-		retval.ymax = Math.max(p.y, retval.ymax);
-		retval.ymin = Math.min(p.y, retval.ymin);
-	}
-	return retval;
-}
-
-Turtle2D.prototype.translateToOrigin = function() {
-	var b = this.bounds();
-	this.translate(-b.xmin, -b.ymin)
-}
-
-Turtle2D.prototype.extend = function(t) {
-	for(var i=0; i<t.history.length; i++) {
-		this.abs(t.history[i].x, t.history[i].y, t.history[i].mark);
-	}
+	return t;
 }
 
 var makeSlot = function(width, length, bitDiameter, dogbone) {
@@ -228,6 +142,9 @@ var makeBoxSide = function(length, width, tabs, gender, thickness, bitDiameter, 
 	if((thickness) >= (length/2-bitDiameter)) {
 		throw new Error("Material thickness is too large (or box size is too small) to make this box");
 	}
+	if(thickness <= 0) {
+		throw new Error("Material thickness must be > 0!")
+	}
 
 	var dx = length-2*thickness;
 
@@ -251,7 +168,6 @@ var makeBoxSide = function(length, width, tabs, gender, thickness, bitDiameter, 
 	box.rel(tabWidth, 0);
 	box.unmark();
 
-
 	box.extend(edge2);
 
 	box.rel(-(dx/2.0 - tabWidth/2.0 - bitDiameter/2.0), 0);
@@ -265,18 +181,34 @@ var makeBoxSide = function(length, width, tabs, gender, thickness, bitDiameter, 
 	return box;
 }
 
-var GCodeGenerator = function(options) {
-	this.setOptions(options);
+var makeGCodeSetup = function(safeZ) {
+	retval = [];
+	retval.push('(US Customary Units)')
+	retval.push('G21');
+	retval.push('(Absolute positioning)')
+	retval.push('G90');
+	retval.push('G0 Z' + safeZ.toFixed(3));
+	retval.push('(Spindle on and wait for spin-up)')
+	retval.push('M4');
+	retval.push('G4 P3');
+	return retval
 }
 
-GCodeGenerator.prototype.setOptions = function(options) {
-	this.feedRate = options.feedRate || this.feedRate || 60.0;
-	this.plungeRate = options.plungeRate || this.plungeRate || 15.0;
-	this.safeZ = options.safeZ || this.safeZ || 0.5;
-	this.bitDiameter = options.bitDiameter || this.bitDiameter || 0.25;
+var makeGCodeTeardown = function(safeZ) {
+	retval = [];
+	retval.push('(Pull out material)')
+	retval.push('G0 Z' + safeZ.toFixed(3));
+	retval.push('(Spindle off and wait for spin-down)')
+	retval.push('M8');
+	retval.push('G4 P3');
+	retval.push('(Go Home)');
+	retval.push('G0 X0 Y0');
+	retval.push('(End Program)');
+	retval.push('M30');
+	return retval;
 }
 
-var generateGCodeList = function(turtle, totalDepth, depthPerPass, feedRate, plungeRate, safeZ, tabThickness) {
+var makeGCodeFromTurtle = function(turtle, totalDepth, depthPerPass, feedRate, plungeRate, safeZ, tabThickness) {
 	retval = [];
 	var plungeRate = plungeRate.toFixed(2);
 	var feedRate = feedRate.toFixed(2);
@@ -295,10 +227,6 @@ var generateGCodeList = function(turtle, totalDepth, depthPerPass, feedRate, plu
 	
 	// Move to position
 	retval.push('G0 X' + turtle.history[0].x.toFixed(5) + ' Y' + turtle.history[0].y.toFixed(5));
-
-	// Spindle on
-	retval.push('M4');
-	retval.push('G4 P3.0');
 
 	var depth = Math.max(totalDepth, -depthPerPass);
 	var pass = 1;
@@ -344,16 +272,6 @@ var generateGCodeList = function(turtle, totalDepth, depthPerPass, feedRate, plu
 		}
 	}
 
-	// Pullup
-	retval.push('G0 Z' + safeZ.toFixed(3));
-	retval.push('(Spindle off)');
-	retval.push('M8');
-	retval.push('');
-	retval.push('(Go Home)');
-	retval.push('G0 X0 Y0 Z0');
-	retval.push('');
-	retval.push('(End Program)');
-	retval.push('M30');
 	return retval;
 }
 

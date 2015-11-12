@@ -51,6 +51,7 @@ CanvasPreview.prototype.draw = function(turtle) {
 
 	for(i in turtle.history) {
 		p = turtle.history[i];
+		console.log(scaleX(p.x) + ',' + scaleY(p.y))
 		context.lineTo(scaleX(p.x), scaleY(p.y))
 	}
 

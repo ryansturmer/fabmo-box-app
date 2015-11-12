@@ -11,25 +11,25 @@
   <body>
 
     <div class="container-fluid">
-      <!-- Title/description -->
-      <div style="text-align:center;">
-        <h1>BoxCutter</h1>
-      </div>
-      
-      <!-- Viewport for 3D view -->
-    <div class="row">  
-      <div class="col-sm-7 col-sm-push-5" style="margin-left: auto; margin-right: auto; ">
-        <div id="viewport-container">
+  
+    <div class="row" style="margin-top:20px;">  
+
+      <div class="col-sm-7 col-sm-push-5" style="margin-left: auto; margin-right: auto;">
+
+        <!-- Title/description -->
+          <h1>BoxCutter</h1>
+
+        <!-- Viewport for 3D view -->
+        <div id="viewport-container" class="viewport-ok">
           <canvas id="viewport"></canvas>
+          <div id="viewport-message"></div>
         </div>
         
-        <!-- Alert Box -->
-        <div class="alert alert-danger" id="alert" style="margin: 10px;"></div>
-
         <!-- Buttons -->
         <div style="margin:20px; text-align: right;">
             <button class="btn btn-lg btn-success" id="btn-cut">
-          Cut <span class="glyphicon glyphicon-wrench" aria-hidden="true"></span>
+          Cut Box!
+          <span class="glyphicon glyphicon-wrench" aria-hidden="true"></span>
             </button>
         </div>
       </div>

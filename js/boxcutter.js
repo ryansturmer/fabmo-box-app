@@ -94,13 +94,18 @@ window.addEventListener('resize', function(evt) {
 });
 
 function error(msg) {
-	$('#alert').show();
-	$('#alert').addClass('alert-danger');
-	$('#alert').text(msg);
+	$('#viewport-container').removeClass('viewport-ok');
+	$('#viewport-container').addClass('viewport-danger');
+	$('#viewport').hide();	
+	$('#viewport-message').text(msg);
+	$('#viewport-message').show();	
 }
 
 function ok() {
-	$('#alert').hide();        
+	$('#viewport-container').removeClass('viewport-danger');
+	$('#viewport-container').addClass('viewport-ok');	
+	$('#viewport-message').hide();
+	$('#viewport').show();	
 }
 
 $('#btn-cut').click( function() {

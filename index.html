@@ -191,12 +191,12 @@
 			function update() {
 					options = getOptions();
 					try {
-						var slotHeight = 0.5;
+						var slotHeight = 0;
 						var slotWidth = 0.2;
 
 						side = makeBoxSide(options.box_length, options.box_depth, options.fingers, options.gender, options.material_thickness, options.bit_diameter, options.tab_width);
-						side.translateToOrigin();            	
-						slot = makePocket(0, slotHeight, options.box_length, slotWidth, options.bit_diameter);
+						//side.translateToOrigin();            	
+						slot = makePocket(0+options.material_thickness, slotHeight, options.box_length-options.material_thickness, slotWidth, options.bit_diameter);
 						ok();
 					} catch(e) {
 						error(e);
@@ -215,7 +215,7 @@
 				if(side) {
 						console.log("side")
 						console.log(side)
-							preview.draw(side);
+						preview.draw([side, slot]);
 				}
 			}
 

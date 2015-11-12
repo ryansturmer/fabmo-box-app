@@ -59,7 +59,7 @@ Turtle2D.prototype.pivot = function(cx,cy, angle) {
 
 Turtle2D.prototype.xmirror = function(x) {
 	var x = x || 0;
-	for(var i in this.history) {
+	for(var i=0; i<this.history.length; i++) {
 		var p = this.history[i];
 		p.x = -(p.x - x) + x;
 	}	

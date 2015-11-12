@@ -28,13 +28,21 @@ var makePocket = function(startX, startY, xLength, yLength, bitDiameter) {
 	xleft = startX + bitRadius;
 	xright = startX + xLength-bitRadius;
 
-	ymid = (ytop-ybot)/2.0;
-	xmid = (xright-xleft)/2.0;
+	ymid = startY + yLength/2.0;
+	xmid = startX + xLength/2.0;
 
+	console.log(xmid)
+	console.log(ymid)
 	t = new Turtle2D();
+
 	t.setPos(xleft,ybot);
 	t.rel(0,0)
+
+	var last_time = false;
 	while(true) {
+		if(Math.abs(xleft-xright) <= bitDiameter) {last_time = true;}
+		if(Math.abs(ytop-ybot) <= bitDiameter) {last_time = true;}
+		
 		t.abs(xright,ybot);
 		ybot = Math.min(ybot + bitDiameter, startY + yLength-bitRadius);
 		t.abs(xright,ytop);
@@ -44,9 +52,9 @@ var makePocket = function(startX, startY, xLength, yLength, bitDiameter) {
 		t.abs(xleft,ybot);
 		xleft = Math.min(xleft + bitDiameter, startX + xLength-bitRadius);
 
-		if(Math.abs(t.pos.x - xmid) <= bitDiameter) {break;}
-		if(Math.abs(t.pos.y - ymid) <= bitDiameter) {break;}
-	}
+		if(last_time) { break;}
+	} 
+	t.abs(t.history[0].x, t.history[0].y)
 	return t;
 }
 
@@ -126,7 +134,6 @@ var makeBoxEdge = function(width, tabs, gender, thickness, bitDiameter, dogbone)
 		retval.rel(-bitDiameter, 0);
 		retval.reverse()
 	}
-	retval.translateToOrigin();
 	return retval;
 }
 
@@ -178,13 +185,14 @@ var makeBoxSide = function(length, width, tabs, gender, thickness, bitDiameter, 
 	start = edge1.history[0];
 	box.abs(start.x, start.y)
 
+	//box.translate(-bitDiameter/2, -bitDiameter/2)
 	return box;
 }
 
 var makeGCodeSetup = function(safeZ) {
 	retval = [];
 	retval.push('(US Customary Units)')
-	retval.push('G21');
+	retval.push('G20');
 	retval.push('(Absolute positioning)')
 	retval.push('G90');
 	retval.push('G0 Z' + safeZ.toFixed(3));
@@ -240,7 +248,7 @@ var makeGCodeFromTurtle = function(turtle, totalDepth, depthPerPass, feedRate, p
 		// Cut contour
 		retval.push('(Cut contour pass ' + pass + ')');
 		var cutting_tab = false;
-		for(i in turtle.history) {
+		for(var i=0; i<turtle.history.length; i++) {
 			p = turtle.history[i];
 			if(p.mark && !cutting_tab) {
 				cutting_tab = true;

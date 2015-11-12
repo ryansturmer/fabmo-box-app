@@ -1,4 +1,4 @@
-
+var TOASTER_TIME = 1000;
 
 var FabMoDashboard = function() {
 	this.target = window.parent;
@@ -23,7 +23,7 @@ FabMoDashboard.prototype.isPresent = function() {
 // https://github.com/rndme/download
 // data can be a string, Blob, File, or dataURL
 FabMoDashboard.prototype._download = function(data, strFileName, strMimeType) {
-
+	
 	var self = window 						// this script is only for browsers anyway...
 	var u = "application/octet-stream" 		// this default mime also triggers iframe downloads
 	var m = strMimeType || u;
@@ -36,7 +36,7 @@ FabMoDashboard.prototype._download = function(data, strFileName, strMimeType) {
 	var fn = strFileName || "download";
 	var blob;
 	var fr;
-
+	
 	blob = x instanceof B ? x : new B([x], {type: m}) ;
 
 	function d2b(u) {
@@ -50,10 +50,10 @@ FabMoDashboard.prototype._download = function(data, strFileName, strMimeType) {
 		for(i;i<mx;++i) { uia[i]=bin.charCodeAt(i); }
 		return new B([uia], {type: t});
 	 }
-
+	  
 	function saver(url, winMode){
-
-		if ('download' in a) { //html5 A[download]
+		
+		if ('download' in a) { //html5 A[download] 			
 			a.href = url;
 			a.setAttribute("download", fn);
 			a.innerHTML = "downloading...";
@@ -68,47 +68,47 @@ FabMoDashboard.prototype._download = function(data, strFileName, strMimeType) {
 
 		if(typeof safari !=="undefined" ){ // handle non-a[download] safari as best we can:
 			url="data:"+url.replace(/^data:([\w\/\-\+]+)/, u);
-			if(!window.open(url)){ // popup blocked, offer direct download:
+			if(!window.open(url)){ // popup blocked, offer direct download: 
 				if(confirm("Displaying New Document\n\nUse Save As... to download, then click back to return to this page.")){ location.href=url; }
 			}
 			return true;
 		}
-
+		
 		//do iframe dataURL download (old ch+FF):
 		var f = D.createElement("iframe");
 		D.body.appendChild(f);
-
+		
 		if(!winMode){ // force a mime that will download:
 			url="data:"+url.replace(/^data:([\w\/\-\+]+)/, u);
 		}
 		f.src=url;
 		setTimeout(function(){ D.body.removeChild(f); }, 333);
-
-	}//end saver
-
+		
+	}//end saver 
+	
 	if (navigator.msSaveBlob) { // IE10+ : (has Blob, but not a[download] or URL)
 		return navigator.msSaveBlob(blob, fn);
-	}
-
+	} 	
+	
 	if(self.URL){ // simple fast and modern way using Blob and URL:
 		saver(self.URL.createObjectURL(blob), true);
 	}else{
 		// handle non-Blob()+non-URL browsers:
 		if(typeof blob === "string" || blob.constructor===z ){
 			try{
-				return saver( "data:" +  m   + ";base64,"  +  self.btoa(blob)  );
+				return saver( "data:" +  m   + ";base64,"  +  self.btoa(blob)  ); 
 			}catch(y){
-				return saver( "data:" +  m   + "," + encodeURIComponent(blob)  );
+				return saver( "data:" +  m   + "," + encodeURIComponent(blob)  ); 
 			}
 		}
-
+		
 		// Blob but not URL:
 		fr=new FileReader();
 		fr.onload=function(e){
-			saver(this.result);
+			saver(this.result); 
 		};
 		fr.readAsDataURL(blob);
-	}
+	}	
 	return true;
 } // _download
 
@@ -128,28 +128,52 @@ FabMoDashboard.prototype._call = function(name, data, callback) {
 FabMoDashboard.prototype._simulateCall = function(name, data, callback) {
 	switch(name) {
 		case "submitJob":
-			alert("Job Submitted: " + data.config.filename);
+			toaster();
+			$('.alert-text').text("Job Submitted: " + data.config.filename);
+			$('.alert-toaster').slideDown(null, function (){
+				setTimeout(function(){$('.alert-toaster').remove(); }, TOASTER_TIME);
+			})
 			this._download(data.data, data.config.filename, "text/plain");
 		break;
 
 		case "runGCode":
-			alert("GCode sent to tool: " + data)
+			toaster();
+			$('.alert-text').text("GCode sent to tool: " + data);
+			$('.alert-toaster').slideDown(null, function (){
+				setTimeout(function(){$('.alert-toaster').remove(); }, TOASTER_TIME);
+			})
 		break;
 
 		case "runSBP":
-			alert("OpenSBP sent to tool: " + data)
+			toaster();
+			$('.alert-text').text("OpenSBP sent to tool: " + data)
+			$('.alert-toaster').slideDown(null, function (){
+				setTimeout(function(){$('.alert-toaster').remove(); }, TOASTER_TIME);
+			})
 		break;
 
 		case "showDRO":
-			alert("DRO Shown.");
+			toaster();
+			$('.alert-text').text("DRO Shown.");
+			$('.alert-toaster').slideDown(null, function (){
+				setTimeout(function(){$('.alert-toaster').remove()}, TOASTER_TIME);
+			})
 		break;
 
 		case "hideDRO":
-			alert("DRO Hidden.");
+			toaster();
+			$('.alert-text').text("DRO Hidden.");
+			$('.alert-toaster').slideDown(null, function (){
+				setTimeout(function(){$('.alert-toaster').remove(); }, TOASTER_TIME);
+			})
 		break;
-
+		
 		default:
-			alert(name + " called.");
+			toaster();
+			$('.alert-text').text(name + " called.");
+			$('.alert-toaster').slideDown(null, function (){
+				setTimeout(function(){$('.alert-toaster').remove(); }, TOASTER_TIME);
+			})
 		break;
 	}
 }
@@ -239,7 +263,7 @@ FabMoDashboard.prototype.submitJob = function(data, config, callback) {
 	// Pass the FormData object if you're a real go-getter
 	else if (data instanceof FormData) {
 		message.file = data.file;
-	}
+	} 
 	// Just pass an object that contains the data
 	else {
 		message.data = data;
@@ -305,7 +329,7 @@ FabMoDashboard.prototype.submitApp = function(data, config,  callback) {
 	// Pass the FormData object if you're a real go-getter
 	else if (data instanceof FormData) {
 		message.file = data.file;
-	}
+	} 
 	// Just pass a plain old object that contains the data
 	else {
 		message.data = data;
@@ -392,6 +416,10 @@ FabMoDashboard.prototype.getAppConfig = function(callback) {
 
 FabMoDashboard.prototype.setAppConfig = function(config, callback) {
 	this._call("setAppConfig", config, callback);
+}
+
+var toaster = function () {
+	$('body').append("<div class='alert-toaster' style='position:fixed; margin: auto; top: 20px; right: 20px; width: 250px; height: 60px; background-color: #F3F3F3; border-radius: 3px; z-index: 1005; box-shadow: 4px 4px 7px -2px rgba(0,0,0,0.75); display: none'><span class='alert-text' style= 'position:absolute; margin: auto; top: 0; right: 0; bottom: 0; left: 0; height: 20px; width: 250px; text-align: center;'></span><div>");
 }
 
 fabmoDashboard = new FabMoDashboard();

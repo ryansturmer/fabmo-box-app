@@ -247,7 +247,7 @@ var makeGCodeFromTurtle = function(turtle, totalDepth, depthPerPass, feedRate, p
 	while(1) {
 		// Plunge
 		retval.push('(Plunge)');
-		retva.push('G0Z0'); // Rapid to surface of material, since plunges are generally slow
+		retval.push('G0Z0'); // Rapid to surface of material, since plunges are generally slow
 		retval.push('G1 Z' + depth.toFixed(5) + 'F' + plungeRate);
 
 		// Cut contour

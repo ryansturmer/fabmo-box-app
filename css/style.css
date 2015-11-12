@@ -15,6 +15,10 @@
 	color: #9F4F48;
 }
 
+#viewport-message {
+    margin: 30px;
+}
+
 h1 {
 	margin-top: 0px;
 	text-align: center;

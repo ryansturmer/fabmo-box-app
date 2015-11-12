@@ -110,7 +110,6 @@ Turtle2D.prototype.bounds = function() {
 	var retval = {xmin : this.pos.x, xmax : this.pos.x, ymin : this.pos.y, ymax : this.pos.y}
 	for(var i=0; i<this.history.length; i++) {
 		p = this.history[i];
-		console.log(p, i)
 		retval.xmax = Math.max(p.x, retval.xmax);
 		retval.xmin = Math.min(p.x, retval.xmin);
 		retval.ymax = Math.max(p.y, retval.ymax);

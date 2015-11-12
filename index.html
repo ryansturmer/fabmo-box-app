@@ -1,264 +1,209 @@
 <!DOCTYPE html>
 <html lang="en">
-	<head>
-		<meta charset="utf-8">
-		<meta http-equiv="X-UA-Compatible" content="IE=edge">
-		<meta name="viewport" content="width=device-width, initial-scale=1">
-		<title>BoxCutter</title>
-		<link href="css/bootstrap.min.css" rel="stylesheet">
-		<link href="css/style.css" rel="stylesheet">
-	</head>
-	<body>
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>BoxCutter</title>
+    <link href="css/bootstrap.min.css" rel="stylesheet">
+    <link href="css/style.css" rel="stylesheet">
+  </head>
+  <body>
 
-		<div class="container-fluid">
-			<!-- Title/description -->
-			<div style="text-align:center;">
-				<h1>BoxCutter</h1>
-			</div>
-			
-			<!-- Viewport for 3D view -->
-		<div class="row">  
-			<div class="col-sm-7 col-sm-push-5" style="margin-left: auto; margin-right: auto; ">
-				<div id="viewport-container">
-					<canvas id="viewport"></canvas>
-				</div>
-				
-				<!-- Alert Box -->
-				<div class="alert alert-danger" id="alert" style="margin: 10px;"></div>
+    <div class="container-fluid">
+      <!-- Title/description -->
+      <div style="text-align:center;">
+        <h1>BoxCutter</h1>
+      </div>
+      
+      <!-- Viewport for 3D view -->
+    <div class="row">  
+      <div class="col-sm-7 col-sm-push-5" style="margin-left: auto; margin-right: auto; ">
+        <div id="viewport-container">
+          <canvas id="viewport"></canvas>
+        </div>
+        
+        <!-- Alert Box -->
+        <div class="alert alert-danger" id="alert" style="margin: 10px;"></div>
 
-				<!-- Buttons -->
-				<div style="margin:20px; text-align: right;">
-						<button class="btn btn-lg btn-success" id="btn-cut">
-					Cut <span class="glyphicon glyphicon-wrench" aria-hidden="true"></span>
-						</button>
-				</div>
-			</div>
+        <!-- Buttons -->
+        <div style="margin:20px; text-align: right;">
+            <button class="btn btn-lg btn-success" id="btn-cut">
+          Cut <span class="glyphicon glyphicon-wrench" aria-hidden="true"></span>
+            </button>
+        </div>
+      </div>
 
-		<div class="col-sm-5 col-sm-pull-7">
-		
-			<!-- Settings Tabs -->
-			<ul class="nav nav-tabs" style="margin-bottom: 20px;" role="tablist">
-				<li role="presentation" class="active"><a href="#boxdims" aria-controls="boxdims" role="tab" data-toggle="tab">Box Dimensions</a></li>
-				<li role="presentation"><a href="#toolsettings" aria-controls="toolsettings" role="tab" data-toggle="tab">Machining Settings</a></li>
-			</ul>
+    <div class="col-sm-5 col-sm-pull-7">
+    
+      <!-- Settings Tabs -->
+      <ul class="nav nav-tabs" style="margin-bottom: 20px;" role="tablist">
+        <li role="presentation" class="active"><a href="#boxdims" aria-controls="boxdims" role="tab" data-toggle="tab">Box Dimensions</a></li>
+        <li role="presentation"><a href="#toolsettings" aria-controls="toolsettings" role="tab" data-toggle="tab">Machining Settings</a></li>
+      </ul>
 
-			<!-- Box Dimensions Tab -->
-			<div class="tab-content">
-				<div role="tabpanel" class="tab-pane active" id="boxdims">
-					<form class="form-horizontal" id="boxdims-form">
-						<div class="form-group">
-							<label for="input-width" class="col-sm-6 control-label">Box Length</label>
-							<div class="col-sm-6">
-								<div class="input-group">
-									<input class="form-control num-input update" id="input-box_length" type="number" min="0.25" max="1000.0" value="4" step="0.25">
-									<span class="input-group-addon">in</span>
-								</div>
-							</div>
-						</div>
-						<div class="form-group">
-							<label for="input-material_thickness" class="col-sm-6 control-label">Box Depth</label>
-							<div class="col-sm-6">
-								<div class="input-group">
-									<input class="form-control num-input update" id="input-box_depth" value="2" step="0.25" type="number" min="0.0625" max="1000.0">
-									<span class="input-group-addon">in</span>
-								</div>
-							</div>
-						</div>
-						<div class="form-group">
-							<label for="input-material_thickness" class="col-sm-6 control-label">Material Thickness</label>
-							<div class="col-sm-6">
-								<div class="input-group">
-									<input class="form-control num-input update" id="input-material_thickness" value="0.25" step="0.05" type="number" min="0.03125" max="6.0">
-									<span class="input-group-addon">in</span>
-								</div>
-							</div>
-						</div>
-						<div class="form-group">
-							<label for="input-fingers" class="col-sm-6 control-label">Number of Fingers</label>
-							<div class="col-sm-6">
-									<input class="form-control num-input update" id="input-fingers" value="4" type="number" min="2" max="100" step="1">
-							</div>
-						</div>
-						<div class="form-group">
-							<label for="input-gender" class="col-sm-6 control-label">Gender</label>
-							<div class="col-sm-6">
-								<select class="form-control update" id="input-gender">
-									<option>Male</option>
-									<option>Female</option>
-								</select>    
-							</div>
-						</div>
-					</form>
-				</div> <!-- tabpanel (Box Dimensions) -->
+      <!-- Box Dimensions Tab -->
+      <div class="tab-content">
+        <div role="tabpanel" class="tab-pane active" id="boxdims">
+          <form class="form-horizontal" id="boxdims-form">
+            <div class="form-group">
+              <label for="input-width" class="col-sm-6 control-label">Box Length</label>
+              <div class="col-sm-6">
+                <div class="input-group">
+                  <input class="form-control num-input update" id="input-box_length" type="number" min="0.25" max="1000.0" value="4" step="0.25">
+                  <span class="input-group-addon">in</span>
+                </div>
+              </div>
+            </div>
+            <div class="form-group">
+              <label for="input-material_thickness" class="col-sm-6 control-label">Box Depth</label>
+              <div class="col-sm-6">
+                <div class="input-group">
+                  <input class="form-control num-input update" id="input-box_depth" value="2" step="0.25" type="number" min="0.0625" max="1000.0">
+                  <span class="input-group-addon">in</span>
+                </div>
+              </div>
+            </div>
+            <div class="form-group">
+              <label for="input-material_thickness" class="col-sm-6 control-label">Material Thickness</label>
+              <div class="col-sm-6">
+                <div class="input-group">
+                  <input class="form-control num-input update" id="input-material_thickness" value="0.25" step="0.05" type="number" min="0.03125" max="6.0">
+                  <span class="input-group-addon">in</span>
+                </div>
+              </div>
+            </div>
+            <div class="form-group">
+              <label for="input-fingers" class="col-sm-6 control-label">Number of Fingers</label>
+              <div class="col-sm-6">
+                  <input class="form-control num-input update" id="input-fingers" value="4" type="number" min="2" max="100" step="1">
+              </div>
+            </div>
+            <div class="form-group">
+              <label for="input-gender" class="col-sm-6 control-label">Gender</label>
+              <div class="col-sm-6">
+                <select class="form-control update" id="input-gender">
+                  <option>Male</option>
+                  <option>Female</option>
+                </select>    
+              </div>
+            </div>
 
-				<!-- Tool Settings Tab -->
-				<div role="tabpanel" class="tab-pane" id="toolsettings">
-					<form class="form-horizontal" id="toolsettings-form">
-						<div class="form-group">
-							<label for="input-width" class="col-sm-6 control-label">Bit Diameter</label>
-							<div class="col-sm-6">
-								<div class="input-group">
-									<input class="form-control num-input update" id="input-bit_diameter" type="number" min="0.03125" max="2.0" value="0.125" step="0.03125">
-									<span class="input-group-addon">in</span>
-								</div>
-							</div>
-						</div>
+            <div class="form-group">
+              <label for="input-bottom_type" class="col-sm-6 control-label">Bottom Type</label>
+              <div class="col-sm-6">
+                <select class="form-control update" id="input-bottom_type">
+                  <option>No Bottom</option>
+                  <option>Slot</option>
+                </select>    
+              </div>
+            </div>
 
-						<div class="form-group">
-							<label for="input-width" class="col-sm-6 control-label">Tab Width</label>
-							<div class="col-sm-6">
-								<div class="input-group">
-									<input class="form-control num-input update" id="input-tab_width" type="number" min="0" max="2.0" value="0.125" step="0.0625">
-									<span class="input-group-addon">in</span>
-								</div>
-							</div>
-						</div>
+            <div id="bottom-controls" style="display:none">
+              <div class="form-group">
+                <label for="input-bottom_thickness" class="col-sm-6 control-label">Bottom Thickness</label>
+                <div class="col-sm-6">
+                  <div class="input-group">
+                    <input class="form-control num-input update" id="input-bottom_thickness" value="0.140" step="0.01" type="number" min="0.001" max="6.0">
+                    <span class="input-group-addon">in</span>
+                  </div>
+                </div>
+              </div>
 
-						<div class="form-group">
-							<label for="input-width" class="col-sm-6 control-label">Safe Z</label>
-							<div class="col-sm-6">
-								<div class="input-group">
-									<input class="form-control num-input update" id="input-safe_z" type="number" min="0" max="1000.0" value="0.5" step="0.25">
-									<span class="input-group-addon">in</span>
-								</div>
-							</div>
-						</div>
+              <div class="form-group">
+                <label for="input-bottom_height" class="col-sm-6 control-label">Bottom Height</label>
+                <div class="col-sm-6">
+                  <div class="input-group">
+                    <input class="form-control num-input update" id="input-bottom_height" value="0.5" step="0.125" type="number" min="0.03125" max="6.0">
+                    <span class="input-group-addon">in</span>
+                  </div>
+                </div>
+              </div>
 
-						<div class="form-group">
-							<label for="input-width" class="col-sm-6 control-label">Feed Rate</label>
-							<div class="col-sm-6">
-								<div class="input-group">
-									<input class="form-control num-input update" id="input-feed_rate" type="number" min="0.0001" max="10.0" value="2.0" step="0.25">
-									<span class="input-group-addon">in/sec</span>
-								</div>
-							</div>
-						</div>
+              <div class="form-group">
+                <label for="input-bottom_slot_thickness" class="col-sm-6 control-label">Bottom Slot Depth</label>
+                <div class="col-sm-6">
+                  <div class="input-group">
+                    <input class="form-control num-input update" id="input-bottom_slot_thickness" value="0.125" step="0.0625" type="number" min="0.03125" max="6.0">
+                    <span class="input-group-addon">in</span>
+                  </div>
+                </div>
+              </div>
+            </div>
 
-						<div class="form-group">
-							<label for="input-width" class="col-sm-6 control-label">Plunge Rate</label>
-							<div class="col-sm-6">
-								<div class="input-group">
-									<input class="form-control num-input update" id="input-plunge_rate" type="number" min="0.0001" max="1000.0" value="0.5" step="0.25">
-									<span class="input-group-addon">in/sec</span>
-								</div>
-							</div>
-						</div>
-					</form>
-				</div> <!-- tabpanel (Tool Settings) -->
+          </form>
+        </div> <!-- tabpanel (Box Dimensions) -->
 
-			</div> <!-- tab-content -->
-		</div>
-	</div>
-			</div>
+        <!-- Tool Settings Tab -->
+        <div role="tabpanel" class="tab-pane" id="toolsettings">
+          <form class="form-horizontal" id="toolsettings-form">
+            <div class="form-group">
+              <label for="input-width" class="col-sm-6 control-label">Bit Diameter</label>
+              <div class="col-sm-6">
+                <div class="input-group">
+                  <input class="form-control num-input update" id="input-bit_diameter" type="number" min="0.03125" max="2.0" value="0.125" step="0.03125">
+                  <span class="input-group-addon">in</span>
+                </div>
+              </div>
+            </div>
 
+            <div class="form-group">
+              <label for="input-width" class="col-sm-6 control-label">Tab Width</label>
+              <div class="col-sm-6">
+                <div class="input-group">
+                  <input class="form-control num-input update" id="input-tab_width" type="number" min="0" max="2.0" value="0.125" step="0.0625">
+                  <span class="input-group-addon">in</span>
+                </div>
+              </div>
+            </div>
 
-		<!-- Dependencies -->
-		<script src="js/lib/jquery.min.js"></script>
-		<script src="js/bootstrap.min.js"></script>
-		<script src="js/lib/dashboard.js"></script>
+            <div class="form-group">
+              <label for="input-width" class="col-sm-6 control-label">Safe Z</label>
+              <div class="col-sm-6">
+                <div class="input-group">
+                  <input class="form-control num-input update" id="input-safe_z" type="number" min="0" max="1000.0" value="0.5" step="0.25">
+                  <span class="input-group-addon">in</span>
+                </div>
+              </div>
+            </div>
 
-		<script src="js/turtle.js"></script>
-		<script src="js/box.js"></script>
-		<script src="js/preview.js"></script>
+            <div class="form-group">
+              <label for="input-width" class="col-sm-6 control-label">Feed Rate</label>
+              <div class="col-sm-6">
+                <div class="input-group">
+                  <input class="form-control num-input update" id="input-feed_rate" type="number" min="0.0001" max="10.0" value="2.0" step="0.25">
+                  <span class="input-group-addon">in/sec</span>
+                </div>
+              </div>
+            </div>
 
-		<script> 
-			var side;
-			var slot;
-			var options;
-
-			function getOptions() {
-					// Extract options from the form
-					var options = {}
-					$('#boxdims-form').find('input').each(function(){
-						var id = this.id.replace(/input-/gi, '');
-						options[id] = Number(this.value);
-					});
-
-					$('#toolsettings-form').find('input').each(function(){
-						var id = this.id.replace(/input-/gi, '');
-						options[id] = Number(this.value);
-					});
-
-					options.gender = $('#input-gender').val() === "Male" ? GENDER_MALE : GENDER_FEMALE;
-					
-					return options
-			}
-
-			$('.update').change(function(evt) {
-				update();
-			});
-
-			function update() {
-					options = getOptions();
-					try {
-						var slotHeight = 0;
-						var slotWidth = 0.2;
-
-						side = makeBoxSide(options.box_length, options.box_depth, options.fingers, options.gender, options.material_thickness, options.bit_diameter, options.tab_width);
-						//side.translateToOrigin();            	
-						slot = makePocket(0+options.material_thickness, slotHeight, options.box_length-options.material_thickness, slotWidth, options.bit_diameter);
-						ok();
-					} catch(e) {
-						error(e);
-						side = null;
-						console.error(e);
-					}
-					redraw();
-			}
-
-			preview = new CanvasPreview('viewport');
-
-			function redraw() {
-				container = document.getElementById('viewport-container');
-				preview.canvas.width = container.offsetWidth;
-				preview.canvas.height = container.offsetHeight;	
-				if(side) {
-						console.log("side")
-						console.log(side)
-						preview.draw([side, slot]);
-				}
-			}
-
-			window.addEventListener('resize', function(evt) {
-				redraw();
-			});
-
-			function error(msg) {
-				$('#alert').show();
-				$('#alert').addClass('alert-danger');
-				$('#alert').text(msg);
-			}
-
-			function ok() {
-				$('#alert').hide();        
-			}
+            <div class="form-group">
+              <label for="input-width" class="col-sm-6 control-label">Plunge Rate</label>
+              <div class="col-sm-6">
+                <div class="input-group">
+                  <input class="form-control num-input update" id="input-plunge_rate" type="number" min="0.0001" max="1000.0" value="0.25" step="0.0625">
+                  <span class="input-group-addon">in/sec</span>
+                </div>
+              </div>
+            </div>
+          </form>
+        </div> <!-- tabpanel (Tool Settings) -->
+      </div> <!-- tab-content -->
+      </div> <!-- settings column -->
+    </div><!-- row -->
+    </div><!-- container -->
 
 
-			$('#btn-cut').click( function() {
-				update();
-				if(side && slot) {			
-					var slotDepth = 0.125;
-					var gSetup = makeGCodeSetup(options.safe_z);
-					var gTeardown = makeGCodeTeardown(options.safe_z);
-					//var gSlot = makeGCodeFromTurtle(slot, slotDepth, 0.75*options.bit_diameter, 60*options.feed_rate, 60*options.plunge_rate, options.safe_z, 0);
-					var gSlot = [];
-					var gSide = makeGCodeFromTurtle(side,-options.material_thickness - 0.010, 0.75*options.bit_diameter, 60*options.feed_rate, 60*options.plunge_rate, options.safe_z, 0.3);
+    <!-- Dependencies -->
+    <script src="js/lib/jquery.min.js"></script>
+    <script src="js/bootstrap.min.js"></script>
+    <script src="js/lib/dashboard.js"></script>
 
-					gSetup.extend(gSlot);
-					gSetup.extend(gSide);
-					gSetup.extend(gTeardown);
+    <!-- Main code -->
+    <script src="js/turtle.js"></script>
+    <script src="js/box.js"></script>
+    <script src="js/preview.js"></script>
+    <script src="js/boxcutter.js"></script>
 
-					var genderName = options.gender === GENDER_MALE ? 'male' : 'female';
-					
-					fabmoDashboard.submitJob(gSetup.join('\n'), {
-												filename : 'box_' +  (options.gender === GENDER_MALE ? 'male' : 'female') + '.nc',
-																		name : 'Box Jointed Panel ' + options.box_length.toFixed(2) + '"x' + options.box_depth.toFixed(2) + '" (' + genderName + ')'
-																	});
-					
-				}
-			});
-			update();
-		</script>
-
-	</body>
+  </body>
 </html>

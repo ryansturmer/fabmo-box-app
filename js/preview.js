@@ -6,7 +6,6 @@ var CanvasPreview = function(id) {
 
 CanvasPreview.prototype.draw = function(turtles) {
 	var bounds = turtles[0].bounds();
-	console.log(bounds)
 	turtles.forEach(function(turtle) {
 		b = turtle.bounds()
 		bounds.xmax = Math.max(bounds.xmax, b.xmax);
@@ -14,8 +13,6 @@ CanvasPreview.prototype.draw = function(turtles) {
 		bounds.ymax = Math.max(bounds.ymax, b.ymax);
 		bounds.ymin = Math.min(bounds.ymin, b.ymin);
 	});
-
-	console.log(bounds);
 
 	var realWidth = bounds.xmax - bounds.xmin;
 	var realHeight = bounds.ymax - bounds.ymin;

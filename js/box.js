@@ -31,8 +31,6 @@ var makePocket = function(startX, startY, xLength, yLength, bitDiameter) {
 	ymid = startY + yLength/2.0;
 	xmid = startX + xLength/2.0;
 
-	console.log(xmid)
-	console.log(ymid)
 	t = new Turtle2D();
 
 	t.setPos(xleft,ybot);
@@ -45,16 +43,24 @@ var makePocket = function(startX, startY, xLength, yLength, bitDiameter) {
 		
 		t.abs(xright,ybot);
 		ybot = Math.min(ybot + bitDiameter, startY + yLength-bitRadius);
+		if(ybot > ytop) {
+			ybot = ytop;
+		}
 		t.abs(xright,ytop);
 		xright = Math.max(xright - bitDiameter, startX + bitRadius);		
 		t.abs(xleft,ytop);
 		ytop = Math.max(ytop - bitDiameter, startY + bitRadius);
+		if(ytop < ybot) {
+			ytop =  ybot;
+		}
 		t.abs(xleft,ybot);
 		xleft = Math.min(xleft + bitDiameter, startX + xLength-bitRadius);
 
 		if(last_time) { break;}
 	} 
+	t.abs(t.history[0].x, t.pos.y)
 	t.abs(t.history[0].x, t.history[0].y)
+
 	return t;
 }
 

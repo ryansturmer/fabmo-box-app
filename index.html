@@ -17,20 +17,23 @@
       <div class="col-sm-7 col-sm-push-5" style="margin-left: auto; margin-right: auto;">
 
         <!-- Title/description -->
-          <h1>BoxCutter</h1>
+        <h1>BoxCutter</h1>
 
         <!-- Viewport for 3D view -->
         <div id="viewport-container" class="viewport-ok">
           <canvas id="viewport"></canvas>
-          <div id="viewport-message"></div>
+          <div id="viewport-message">
+            <img id="viewport-message-image" src="img/ex.png"></img>
+            <div id="viewport-message-text"> </div>
+          </div>
         </div>
         
         <!-- Buttons -->
         <div style="margin:20px; text-align: right;">
-            <button class="btn btn-lg btn-success" id="btn-cut">
-          Cut Box!
+          <button class="btn btn-lg btn-success" id="btn-cut">
+          Cut Part!
           <span class="glyphicon glyphicon-wrench" aria-hidden="true"></span>
-            </button>
+          </button>
         </div>
       </div>
 
@@ -45,12 +48,42 @@
       <!-- Box Dimensions Tab -->
       <div class="tab-content">
         <div role="tabpanel" class="tab-pane active" id="boxdims">
-          <form class="form-horizontal" id="boxdims-form">
+          <form class="form-horizontal" id="boxdims-form">          
             <div class="form-group">
-              <label for="input-width" class="col-sm-6 control-label">Box Length</label>
+              <label for="input-part" class="col-sm-6 control-label">Box Part</label>
+              <div class="col-sm-6">
+                <select class="form-control update" id="input-part">
+                  <option value="male">Side (Male)</option>
+                  <option value="female">Side (Female)</option>
+                  <!--<option>Bottom</option>-->
+                </select>    
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label for="input-bottom_type" class="col-sm-6 control-label">Bottom Type</label>
+              <div class="col-sm-6">
+                <select class="form-control update" id="input-bottom_type">
+                  <option>No Bottom</option>
+                  <option>Slot</option>
+                </select>    
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label for="input-box_length" class="col-sm-6 control-label">Box Length</label>
               <div class="col-sm-6">
                 <div class="input-group">
                   <input class="form-control num-input update" id="input-box_length" type="number" min="0.25" max="1000.0" value="4" step="0.25">
+                  <span class="input-group-addon">in</span>
+                </div>
+              </div>
+            </div>
+            <div class="form-group">
+              <label for="input-box_width" class="col-sm-6 control-label">Box Width</label>
+              <div class="col-sm-6">
+                <div class="input-group">
+                  <input class="form-control num-input update" id="input-box_width" value="4" step="0.25" type="number" min="0.0625" max="1000.0">
                   <span class="input-group-addon">in</span>
                 </div>
               </div>
@@ -79,27 +112,6 @@
                   <input class="form-control num-input update" id="input-fingers" value="4" type="number" min="2" max="100" step="1">
               </div>
             </div>
-            <div class="form-group">
-              <label for="input-part" class="col-sm-6 control-label">Gender</label>
-              <div class="col-sm-6">
-                <select class="form-control update" id="input-part">
-                  <option value="male">Side (Male)</option>
-                  <option value="female">Side (Female)</option>
-                  <!--<option>Bottom</option>-->
-                </select>    
-              </div>
-            </div>
-
-            <div class="form-group">
-              <label for="input-bottom_type" class="col-sm-6 control-label">Bottom Type</label>
-              <div class="col-sm-6">
-                <select class="form-control update" id="input-bottom_type">
-                  <option>No Bottom</option>
-                  <option>Slot</option>
-                </select>    
-              </div>
-            </div>
-
             <div id="bottom-controls" style="display:none">
               <div class="form-group">
                 <label for="input-bottom_thickness" class="col-sm-6 control-label">Bottom Thickness</label>
@@ -193,6 +205,16 @@
               <div class="col-sm-6">
                 <div class="input-group">
                   <input class="form-control num-input update" id="input-fit_allowance" type="number" min="0.000" max="1000.0" value="0.000" step="0.010">
+                  <span class="input-group-addon">in</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label for="input-cut_through" class="col-sm-6 control-label">Cut-Through</label>
+              <div class="col-sm-6">
+                <div class="input-group">
+                  <input class="form-control num-input update" id="input-cut_through" type="number" min="0.000" max="1000.0" value="0.010" step="0.010">
                   <span class="input-group-addon">in</span>
                 </div>
               </div>

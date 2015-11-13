@@ -18,14 +18,12 @@ var makeRectangle = function(width, height, bitDiameter, tabWidth) {
 	t = new Turtle2D();
 
 	var bitRadius = bitDiameter/2.0;
-	console.log(height)
 	t.setPos(-bitRadius, -bitRadius);
 	t.rel(0,0);
 
 	var w = ((width + bitDiameter)/2.0) - tabWidth/2 - bitDiameter/2;
 	var h = ((height + bitDiameter)/2.0) - tabWidth/2 - bitDiameter/2;
 
-	console.log(h)
 	t.rel(w, 0);
 	t.mark();
 	t.rel(tabWidth + bitDiameter, 0)
@@ -50,9 +48,6 @@ var makeRectangle = function(width, height, bitDiameter, tabWidth) {
 	t.unmark();
 	t.rel(0,-h);
 
-	t.translateToOrigin();
-	console.log(JSON.stringify(t.bounds()));
-	console.log(JSON.stringify(t.history))
 	return t;
 }
 

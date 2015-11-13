@@ -3,6 +3,7 @@ var side;
 var slot;
 var options;
 var geometry = [];
+var design_is_ok = false;
 
 function getOptions() {
 		// Extract options from the form
@@ -64,7 +65,8 @@ function update() {
 
 			switch(options.part) {
 				case 'side':
-					side = makeBoxSide(	options.box_length, 
+					var length = options.gender === GENDER_MALE ? options.box_length : options.box_width;
+					side = makeBoxSide(	length, 
 										options.box_depth, 
 										options.fingers, 
 										options.gender, 
@@ -89,10 +91,9 @@ function update() {
 
 						slot = makePocket(	options.material_thickness+bitRadius-options.bottom_slot_thickness, 
 											options.bottom_height-options.bottom_thickness/2.0, 
-											options.box_length-(2*options.material_thickness)+2*options.bottom_slot_thickness, 
+											length-(2*options.material_thickness)+2*options.bottom_slot_thickness, 
 											options.bottom_thickness, 
 											options.bit_diameter);		
-						//console.log(slot)					
 						geometry.unshift(slot);
 					} else {
 						slot = null;
@@ -101,7 +102,7 @@ function update() {
 
 				case 'bottom':
 					bottom = makeRectangle(	options.box_length + 2*options.bottom_slot_thickness - 2*options.material_thickness, 
-											options.box_depth + 2*options.bottom_slot_thickness - 2*options.material_thickness, 
+											options.box_width + 2*options.bottom_slot_thickness - 2*options.material_thickness, 
 											options.bit_diameter,
 											options.tab_width);
 					geometry = [bottom];
@@ -110,9 +111,6 @@ function update() {
 			ok();
 		} catch(e) {
 			error(e);
-			side = null;
-			slot = null;
-			console.error(e);
 		}
 		redraw();
 }
@@ -134,8 +132,10 @@ function error(msg) {
 	$('#viewport-container').removeClass('viewport-ok');
 	$('#viewport-container').addClass('viewport-danger');
 	$('#viewport').hide();	
-	$('#viewport-message').text(msg);
-	$('#viewport-message').show();	
+	$('#viewport-message-text').text(msg);
+	$('#viewport-message').show();
+	$('#btn-cut').prop('disabled', true);
+	design_is_ok = false;
 }
 
 function ok() {
@@ -143,41 +143,98 @@ function ok() {
 	$('#viewport-container').addClass('viewport-ok');	
 	$('#viewport-message').hide();
 	$('#viewport').show();
+	$('#btn-cut').prop('disabled', false);
+	design_is_ok = true;
+}
+
+function makeSideGCode() {
+	// Setup
+	var gSetup = makeGCodeSetup(options.safe_z);
+	
+	// Slot for bottom (if requested)
+	if(slot) {
+		var gSlotTitle = ['', '(SLOT FOR BOTTOM OF BOX)', ''];
+		var gSlot = makeGCodeFromTurtle(slot,
+										-options.bottom_slot_thickness, 
+										0.75*options.bit_diameter, 
+										60*options.feed_rate, 
+										60*options.plunge_rate, 
+										options.safe_z, 
+										options.tab_width)
+	} else {
+		var gSlotTitle = []
+		gSlot = [];
+	}
+
+	// Side
+	var gSideTitle = ['', '(SIDE OF BOX CUTOUT)', ''];
+	var gSide = makeGCodeFromTurtle(	side,
+										-options.material_thickness - options.cut_through, 
+										0.75*options.bit_diameter, 
+										60*options.feed_rate, 
+										60*options.plunge_rate, 
+										options.safe_z, 
+										options.tab_width);
+
+	// Teardown
+	var gTeardown = makeGCodeTeardown(options.safe_z);
+	
+	gSetup.extend(gSlotTitle);
+	gSetup.extend(gSlot);
+	gSetup.extend(gSideTitle);
+	gSetup.extend(gSide);
+	gSetup.extend(gTeardown);
+
+	return gSetup.join('\n');
+}
+
+function makeBottomGCode() {
+	// Setup
+	var gSetup = makeGCodeSetup(options.safe_z);
+	
+	// Bottom
+	var gBottomTitle = ['', '(BOTTOM OF BOX)', ''];
+	var gBottom = makeGCodeFromTurtle(	bottom,
+										-options.material_thickness - options.cut_through, 
+										0.75*options.bit_diameter, 
+										60*options.feed_rate, 
+										60*options.plunge_rate, 
+										options.safe_z, 
+										options.tab_width);
+
+	// Teardown
+	var gTeardown = makeGCodeTeardown(options.safe_z);
+	
+	gSetup.extend(gBottomTitle);
+	gSetup.extend(gBottom);
+	gSetup.extend(gTeardown);
+
+	return gSetup.join('\n');
 }
 
 $('#btn-cut').click( function() {
 	update();
-	if(side) {			
-		// Setup
-		var gSetup = makeGCodeSetup(options.safe_z);
-		
-		// Slot for bottom (if requested)
-		if(slot) {
-			var gSlotTitle = ['', '(SLOT FOR BOTTOM OF BOX)', ''];
-			var gSlot = makeGCodeFromTurtle(slot,-options.bottom_slot_thickness, 0.75*options.bit_diameter, 60*options.feed_rate, 60*options.plunge_rate, options.safe_z, options.tab_width)
-		} else {
-			var gSlotTitle = []
-			gSlot = [];
-		}
-
-		// Side
-		var gSlotTitle = ['', '(SIDE OF BOX CUTOUT)', ''];
-		var gSide = makeGCodeFromTurtle(side,-options.material_thickness - 0.010, 0.75*options.bit_diameter, 60*options.feed_rate, 60*options.plunge_rate, options.safe_z, options.tab_width);
-
-		// Teardown
-		var gTeardown = makeGCodeTeardown(options.safe_z);
-		
-		gSetup.extend(gSlot);
-		gSetup.extend(gSide);
-		gSetup.extend(gTeardown);
-
-		var genderName = options.gender === GENDER_MALE ? 'male' : 'female';
-		
-		fabmoDashboard.submitJob(gSetup.join('\n'), {
-									filename : 'box_' +  (options.gender === GENDER_MALE ? 'male' : 'female') + '.nc',
-															name : 'Box Jointed Panel ' + options.box_length.toFixed(2) + '"x' + options.box_depth.toFixed(2) + '" (' + genderName + ')'
-														});
-		
+	if(!design_is_ok) {
+		return;
 	}
+	var genderName = options.gender === GENDER_MALE ? 'male' : 'female';
+
+	switch(options.part) {
+		case 'side':
+			code = makeSideGCode();
+			fabmoDashboard.submitJob(code, {
+				filename : 'box_' +  genderName + '.nc',
+					name : 'Box Jointed Panel (' + genderName + ')'
+			});
+			break;
+
+			case 'bottom':
+			code = makeBottomGCode();
+			fabmoDashboard.submitJob(code, {
+				filename : 'box_bottom.nc',
+					name : 'Bottom of Box '
+			});
+			break;
+	}	
 });
 update();

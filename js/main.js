@@ -2,6 +2,7 @@
 var side;
 var slot;
 var options;
+var geometry = [];
 
 function getOptions() {
 		// Extract options from the form
@@ -16,11 +17,35 @@ function getOptions() {
 			options[id] = Number(this.value);
 		});
 
-		options.gender = $('#input-gender').val() === "Male" ? GENDER_MALE : GENDER_FEMALE;
+		switch($('#input-part').val()) {
+			case "male":
+				options.gender = GENDER_MALE;
+				options.part = "side";
+				break;
+
+			case "female":
+				options.gender = GENDER_FEMALE;
+				options.part = "side";
+				break;
+
+			case "bottom":
+				options.part = "bottom";
+				break;
+
+			default:
+				console.error("Unknown part: " + $('#input-part').val())
+				break;
+		}
 		options.do_slot = $('#input-bottom_type').val() === "Slot"
+
+		bottom_option = $("#input-part option[value='bottom']");
 		if(options.do_slot) {
+			if(!bottom_option.length) {
+				$("#input-part").append('<option value="bottom">Bottom</option>');
+			}
 			$('#bottom-controls').show(250)
 		} else {
+			$("#input-part option[value='bottom']").remove();
 			$('#bottom-controls').hide(250)						
 		}
 
@@ -33,36 +58,54 @@ $('.update').change(function(evt) {
 
 function update() {
 		options = getOptions();
+
 		try {
-			var bitRadius = options.bit_diameter/2.0
-			side = makeBoxSide(	options.box_length, 
-								options.box_depth, 
-								options.fingers, 
-								options.gender, 
-								options.material_thickness, 
-								options.bit_diameter, 
-								options.tab_width);
+			var bitRadius = options.bit_diameter/2.0;
 
-			if(options.do_slot) {
-				if(options.bottom_slot_thickness > options.material_thickness) {
-					throw new Error("Slot thickness for bottom is thicker than the material")
-				}
+			switch(options.part) {
+				case 'side':
+					side = makeBoxSide(	options.box_length, 
+										options.box_depth, 
+										options.fingers, 
+										options.gender, 
+										options.material_thickness, 
+										options.bit_diameter, 
+										options.tab_width,
+										options.fit_allowance);
 
-				if(options.bottom_height < options.bottom_thickness/2.0) {
-					throw new Error("Slot height too low")
-				}
+					geometry = [side];
+					if(options.do_slot) {
+						if(options.bottom_slot_thickness > options.material_thickness) {
+							throw new Error("Slot thickness for bottom is thicker than the material")
+						}
 
-				if(options.bottom_height > options.box_depth-options.bottom_thickness) {
-					throw new Error("Slot height too high")								
-				}
+						if(options.bottom_height < options.bottom_thickness/2.0) {
+							throw new Error("Slot height too low")
+						}
 
-				slot = makePocket(	options.material_thickness+bitRadius-options.bottom_slot_thickness, 
-									options.bottom_height-options.bottom_thickness/2.0, 
-									options.box_length-(2*options.material_thickness)+2*options.bottom_slot_thickness, 
-									options.bottom_thickness, 
-									options.bit_diameter);							
-			} else {
-				slot = null;
+						if(options.bottom_height > options.box_depth-options.bottom_thickness) {
+							throw new Error("Slot height too high")								
+						}
+
+						slot = makePocket(	options.material_thickness+bitRadius-options.bottom_slot_thickness, 
+											options.bottom_height-options.bottom_thickness/2.0, 
+											options.box_length-(2*options.material_thickness)+2*options.bottom_slot_thickness, 
+											options.bottom_thickness, 
+											options.bit_diameter);		
+						//console.log(slot)					
+						geometry.unshift(slot);
+					} else {
+						slot = null;
+					}
+					break;
+
+				case 'bottom':
+					bottom = makeRectangle(	options.box_length + 2*options.bottom_slot_thickness - 2*options.material_thickness, 
+											options.box_depth + 2*options.bottom_slot_thickness - 2*options.material_thickness, 
+											options.bit_diameter,
+											options.tab_width);
+					geometry = [bottom];
+				break;
 			}
 			ok();
 		} catch(e) {
@@ -80,13 +123,7 @@ function redraw() {
 	container = document.getElementById('viewport-container');
 	preview.canvas.width = container.offsetWidth;
 	preview.canvas.height = container.offsetHeight;	
-	if(side) {
-			if(slot) {
-				preview.draw([side, slot]);
-			} else {
-				preview.draw([side]);							
-			}
-	}
+	preview.draw(geometry);
 }
 
 window.addEventListener('resize', function(evt) {
@@ -105,7 +142,7 @@ function ok() {
 	$('#viewport-container').removeClass('viewport-danger');
 	$('#viewport-container').addClass('viewport-ok');	
 	$('#viewport-message').hide();
-	$('#viewport').show();	
+	$('#viewport').show();
 }
 
 $('#btn-cut').click( function() {

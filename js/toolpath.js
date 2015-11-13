@@ -14,6 +14,48 @@ var equals = function(a,b) {
 	return Math.abs(a-b) < EPS;
 }
 
+var makeRectangle = function(width, height, bitDiameter, tabWidth) {
+	t = new Turtle2D();
+
+	var bitRadius = bitDiameter/2.0;
+	console.log(height)
+	t.setPos(-bitRadius, -bitRadius);
+	t.rel(0,0);
+
+	var w = ((width + bitDiameter)/2.0) - tabWidth/2 - bitDiameter/2;
+	var h = ((height + bitDiameter)/2.0) - tabWidth/2 - bitDiameter/2;
+
+	console.log(h)
+	t.rel(w, 0);
+	t.mark();
+	t.rel(tabWidth + bitDiameter, 0)
+	t.unmark();
+	t.rel(w,0);
+
+	t.rel(0, h);
+	t.mark();
+	t.rel(0, tabWidth + bitDiameter)
+	t.unmark();
+	t.rel(0,h);
+
+	t.rel(-w, 0);
+	t.mark();
+	t.rel(-(tabWidth + bitDiameter), 0)
+	t.unmark();
+	t.rel(-w,0);
+
+	t.rel(0, -h);
+	t.mark();
+	t.rel(0, -(tabWidth + bitDiameter))
+	t.unmark();
+	t.rel(0,-h);
+
+	t.translateToOrigin();
+	console.log(JSON.stringify(t.bounds()));
+	console.log(JSON.stringify(t.history))
+	return t;
+}
+
 var makePocket = function(startX, startY, xLength, yLength, bitDiameter) {
 	var height = yLength;
 	var width = xLength;
@@ -98,7 +140,7 @@ var makeSlot = function(width, length, bitDiameter, dogbone) {
 	return t;
 }
 
-var makeBoxEdge = function(width, tabs, gender, thickness, bitDiameter, dogbone) {
+var makeBoxEdge = function(width, tabs, gender, thickness, bitDiameter, dogbone, fitAllowance) {
 	
 	var segments = (tabs*2)-1
 	var segLength = width/segments;
@@ -122,7 +164,7 @@ var makeBoxEdge = function(width, tabs, gender, thickness, bitDiameter, dogbone)
 
 	// Cut the slots
 	for(var i=0; i<slots; i++) {
-		slot = makeSlot(segLength, thickness, bitDiameter, dogbone);
+		slot = makeSlot(segLength + fitAllowance, thickness, bitDiameter, dogbone);
 		slot.translate(loc, 0);
 		retval.extend(slot);
 		loc += 2*segLength;
@@ -151,7 +193,7 @@ var midpoint = function(a, b) {
 	return {x : a.x + ((b.x-a.x)/2.0), y : a.y + ((b.y - a.y)/2.0)}
 }
 
-var makeBoxSide = function(length, width, tabs, gender, thickness, bitDiameter, tabWidth) {
+var makeBoxSide = function(length, width, tabs, gender, thickness, bitDiameter, tabWidth, fitAllowance) {
 	if((thickness) >= (length/2-bitDiameter)) {
 		throw new Error("Material thickness is too large (or box size is too small) to make this box");
 	}
@@ -161,12 +203,12 @@ var makeBoxSide = function(length, width, tabs, gender, thickness, bitDiameter, 
 
 	var dx = length-2*thickness;
 
-	edge1 = makeBoxEdge(width, tabs, gender, thickness, bitDiameter, true);
+	edge1 = makeBoxEdge(width, tabs, gender, thickness, bitDiameter, true, 0);
 	edge1.pivot(0,0,Math.PI/2.0);
 
 	edge1.xmirror(0);
 	
-	edge2 = makeBoxEdge(width, tabs, gender, thickness, bitDiameter, true);
+	edge2 = makeBoxEdge(width, tabs, gender, thickness, bitDiameter, true, 0);
 	edge2.pivot(0,0,Math.PI/2.0);
 	edge2.translate(length+bitDiameter, 0);
 	edge2.reverse();

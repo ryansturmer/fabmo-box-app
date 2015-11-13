@@ -18,6 +18,8 @@ function getOptions() {
 			options[id] = Number(this.value);
 		});
 
+		options.fingers = Math.round(options.fingers);
+		
 		switch($('#input-part').val()) {
 			case "male":
 				options.gender = GENDER_MALE;

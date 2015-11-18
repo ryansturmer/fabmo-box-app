@@ -206,7 +206,7 @@ var makeBoxSide = function(length, width, tabs, gender, thickness, bitDiameter, 
 	
 	edge2 = makeBoxEdge(width, tabs, gender, thickness, bitDiameter, true, 0);
 	edge2.pivot(0,0,Math.PI/2.0);
-	edge2.translate(length+bitDiameter, 0);
+	edge2.translate(length, 0);
 	edge2.reverse();
 
 	box = new Turtle2D();

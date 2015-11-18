@@ -118,9 +118,9 @@ function update() {
 							throw new Error("Slot height too high")								
 						}
 
-						slot = makePocket(	options.material_thickness+bitRadius-options.bottom_slot_thickness, 
+						slot = makePocket(	options.material_thickness-options.bottom_slot_thickness-bitRadius, 
 											options.bottom_height-options.bottom_thickness/2.0, 
-											length-(2*options.material_thickness)+2*options.bottom_slot_thickness, 
+											length-(2*options.material_thickness)+2*options.bottom_slot_thickness+options.bit_diameter, 
 											options.bottom_thickness, 
 											options.bit_diameter);		
 						geometry.unshift(slot);

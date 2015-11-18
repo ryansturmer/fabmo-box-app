@@ -293,59 +293,35 @@ var makeBoxWaffleSide = function(length, width, tabs, gender, thickness, bitDiam
 var makeBoxWaffleBottom = function(length, width, tabs, thickness, bitDiameter, tabWidth, fitAllowance) {
 	
 	var gender = GENDER_FEMALE;
-
 	var length = length - 2*thickness;
 	var width = width - 2*thickness;
 	var bitRadius = bitDiameter/2.0;
 
+	// Left edge
 	edge1 = makeBoxEdge(width, tabs, gender, thickness, bitDiameter, true, 0);
 	edge1.pivot(0,0,Math.PI/2.0);
 	edge1.xmirror(0);
 	
+	// Top edge
 	edge2 = makeBoxEdge(length, tabs, gender, thickness, bitDiameter, true, 0);
 	edge2.ymirror(0);
 	edge2.translate(thickness, width+thickness);
 
+	// Right edge
 	edge3 = makeBoxEdge(width, tabs, gender, thickness, bitDiameter, true, 0);
 	edge3.pivot(0,0,Math.PI/2.0);
 	edge3.translate(length+2*thickness,0);
 	edge3.reverse();
 
+	// Bottom Edge
 	edge4 = makeBoxEdge(length, tabs, gender, thickness, bitDiameter, true, 0);
 	edge4.translate(thickness, -thickness)
 	edge4.reverse();
 
-	// Left edge
 	box = new Turtle2D();
-/*	
-	a = edge4.end();
-	b = edge1.start();
 
-	box.abs(b.x,a.y);
-	edge1.ltrim(2);
-	edge4.rtrim(2);
-
-	a = edge1.end();
-	b = edge2.start();
-	edge1.rtrim(2);
-	edge1.abs(a.x, b.y);
-	edge2.ltrim(2);
-
-	a = edge2.end();
-	b = edge3.start();
-	edge2.rtrim(2);
-	edge2.abs(b.x, a.y);
-	edge3.ltrim(2);
-
-	a = edge3.end();
-	b = edge4.start();
-	edge3.rtrim(2);
-	edge3.abs(a.x, b.y);
-	edge4.ltrim(2);
-*/
-
+	// Make bottom outline
 	var start = edge1.start();
-
 	box.abs(start.x, start.y);
 	
 	box.extend(edge1);
@@ -356,7 +332,6 @@ var makeBoxWaffleBottom = function(length, width, tabs, thickness, bitDiameter, 
 	box.abs(start.x, start.y)
 	box.translateToOrigin();
 	box.translate(-bitRadius, -bitRadius)
-	console.log(box.dimensions())
 
 	return box;
 }

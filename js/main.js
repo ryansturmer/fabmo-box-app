@@ -5,6 +5,31 @@ var options;
 var geometry = [];
 var design_is_ok = false;
 
+
+function saveForm() {
+	form_data = {}
+	$('#boxdims-form').find('input,select').each(function(){
+		form_data[this.id] = this.value;
+	});
+	localStorage.formData = JSON.stringify(form_data);
+}
+
+function loadForm() {
+	var form_data = {};
+	try {
+		form_data = JSON.parse(localStorage.formData)		
+	} catch(e) {
+		console.warn(e);
+	}
+
+	$('#boxdims-form').find('input,select').each(function(){
+		if(this.id in form_data) {
+			$(this).val(form_data[this.id]);
+		}
+	});
+
+}
+
 function getOptions() {
 		// Extract options from the form
 		var options = {}
@@ -69,9 +94,6 @@ function getOptions() {
 		return options
 }
 
-$('.update').change(function(evt) {
-	update();
-});
 
 function update() {
 		options = getOptions();
@@ -103,7 +125,6 @@ function update() {
 											options.tab_width,
 											options.fit_allowance);						
 					}
-					console.log(side.dimensions())
 					geometry = [side];
 					if(options.do_slot) {
 						if(options.bottom_slot_thickness > options.material_thickness) {
@@ -138,7 +159,6 @@ function update() {
 														options.material_thickness, 
 														options.bit_diameter, 
 														0, 0);
-						console.log(bottom.dimensions());
 //function(length, width, tabs, thickness, bitDiameter, tabWidth, fitAllowance)
 					} else {
 						bottom = makeRectangle(	options.box_length + 2*options.bottom_slot_thickness - 2*options.material_thickness, 
@@ -253,10 +273,12 @@ function makeBottomGCode() {
 	return gSetup.join('\n');
 }
 
-$('#btn-cut').click( function() {
+function onCut() {
 	update();
+
+	// Just crap out if the design doesn't pass
 	if(!design_is_ok) {
-		return;
+		fabmoDashboard.notify("error", "Can't cut this design.  Check your parameters!");
 	}
 	var genderName = options.gender === GENDER_MALE ? 'male' : 'female';
 
@@ -277,5 +299,16 @@ $('#btn-cut').click( function() {
 			});
 			break;
 	}	
+}
+
+function onFormChange() {
+	saveForm();
+	update();	
+}
+
+$(document).ready(function() {
+  	$('#btn-cut').click(onCut);
+  	$('.update').change(onFormChange);
+  	loadForm();
+  	update();
 });
-update();

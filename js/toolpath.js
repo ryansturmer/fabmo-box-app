@@ -232,6 +232,122 @@ var makeBoxSide = function(length, width, tabs, gender, thickness, bitDiameter, 
 	return box;
 }
 
+var makeBoxWaffleSide = function(length, width, tabs, gender, thickness, bitDiameter, tabWidth, fitAllowance) {
+	if((thickness) >= (length/2-bitDiameter)) {
+		throw new Error("Material thickness is too large (or box size is too small) to make this box");
+	}
+	if(thickness <= 0) {
+		throw new Error("Material thickness must be > 0!")
+	}
+
+	var dx = length-2*thickness;
+	var bitRadius = bitDiameter/2.0;
+	
+	edge1 = makeBoxEdge(width, tabs, gender, thickness, bitDiameter, true, 0);
+	edge1.pivot(0,0,Math.PI/2.0);
+
+	edge1.xmirror(0);
+	
+	edge2 = makeBoxEdge(width, tabs, gender, thickness, bitDiameter, true, 0);
+	edge2.pivot(0,0,Math.PI/2.0);
+	edge2.translate(length+bitDiameter, 0);
+	edge2.reverse();
+
+	edge3 = makeBoxEdge(length-2*thickness, tabs, GENDER_MALE, thickness, bitDiameter, true, 0);
+	edge3.translate(bitRadius,0)
+	edge3.reverse();
+
+	// Left edge
+	box = new Turtle2D();
+	box.abs(edge1.history[0].x, edge1.history[0].y)
+	box.extend(edge1);
+
+	// Across
+	box.rel(dx/2.0 - tabWidth/2.0 - bitDiameter/2.0, 0);
+	box.mark();
+	box.rel(tabWidth, 0);
+	box.unmark();
+
+	// Right edge
+	box.extend(edge2);
+
+	edge3.translate(thickness, 0)
+
+	box.extend(edge3);
+
+/*	box.rel(-(dx/2.0 - tabWidth/2.0 - bitDiameter/2.0), 0);
+	box.mark();
+	box.rel(-tabWidth, 0);
+	box.unmark();
+*/
+
+	start = edge1.history[0];
+	box.abs(start.x, start.y)
+
+	//box.translate(-bitDiameter/2, -bitDiameter/2)
+	return box;
+}
+
+
+var makeBoxWaffleBottom = function(length, width, tabs, thickness, bitDiameter, tabWidth, fitAllowance) {
+	
+	var gender = GENDER_FEMALE;
+
+	edge1 = makeBoxEdge(width, tabs, gender, thickness, bitDiameter, true, 0);
+	edge1.pivot(0,0,Math.PI/2.0);
+	edge1.xmirror(0);
+	
+	edge2 = makeBoxEdge(length, tabs, gender, thickness, bitDiameter, true, 0);
+	edge2.ymirror(0);
+	edge2.translate(0,width)
+
+	edge3 = makeBoxEdge(width, tabs, gender, thickness, bitDiameter, true, 0);
+	edge3.pivot(0,0,Math.PI/2.0);
+	edge3.translate(length,0);
+	edge3.reverse();
+
+	edge4 = makeBoxEdge(length, tabs, gender, thickness, bitDiameter, true, 0);
+	edge4.reverse();
+
+	// Left edge
+	box = new Turtle2D();
+	
+	a = edge4.end();
+	b = edge1.start();
+
+	box.abs(b.x,a.y);
+	edge1.ltrim(2);
+	edge4.rtrim(2);
+
+	a = edge1.end();
+	b = edge2.start();
+	edge1.rtrim(2);
+	edge1.abs(a.x, b.y);
+	edge2.ltrim(2);
+
+	a = edge2.end();
+	b = edge3.start();
+	edge2.rtrim(2);
+	edge2.abs(b.x, a.y);
+	edge3.ltrim(2);
+
+	a = edge3.end();
+	b = edge4.start();
+	edge3.rtrim(2);
+	edge3.abs(a.x, b.y);
+	edge4.ltrim(2);
+
+	box.extend(edge1);
+	box.extend(edge2);
+	box.extend(edge3);
+	box.extend(edge4);
+	
+	start = box.history[0];
+	box.abs(start.x, start.y)
+
+	return box;
+}
+
 var makeGCodeSetup = function(safeZ) {
 	retval = [];
 	retval.push('(US Customary Units)')

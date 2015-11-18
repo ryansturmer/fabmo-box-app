@@ -8,7 +8,7 @@ var design_is_ok = false;
 
 function saveForm() {
 	form_data = {}
-	$('#boxdims-form').find('input,select').each(function(){
+	$('#boxdims-form,#toolsettings-form').find('input,select').each(function(){
 		form_data[this.id] = this.value;
 	});
 	localStorage.formData = JSON.stringify(form_data);
@@ -22,7 +22,7 @@ function loadForm() {
 		console.warn(e);
 	}
 
-	$('#boxdims-form').find('input,select').each(function(){
+	$('#boxdims-form,#toolsettings-form').find('input,select').each(function(){
 		if(this.id in form_data) {
 			$(this).val(form_data[this.id]);
 		}

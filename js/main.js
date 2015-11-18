@@ -19,7 +19,7 @@ function getOptions() {
 		});
 
 		options.fingers = Math.round(options.fingers);
-		
+		options.bottom_type = $('#input-bottom_type').val();
 		switch($('#input-part').val()) {
 			case "male":
 				options.gender = GENDER_MALE;
@@ -39,17 +39,31 @@ function getOptions() {
 				console.error("Unknown part: " + $('#input-part').val())
 				break;
 		}
-		options.do_slot = $('#input-bottom_type').val() === "Slot"
+		options.do_slot = options.bottom_type === "slot"
+		options.do_finger_bottom = options.bottom_type === "finger"
 
 		bottom_option = $("#input-part option[value='bottom']");
-		if(options.do_slot) {
-			if(!bottom_option.length) {
-				$("#input-part").append('<option value="bottom">Bottom</option>');
-			}
-			$('#bottom-controls').show(250)
-		} else {
-			$("#input-part option[value='bottom']").remove();
-			$('#bottom-controls').hide(250)						
+
+		switch(options.bottom_type) {
+			case 'none':
+				$("#input-part option[value='bottom']").remove();
+				$('#bottom-controls').hide(250)						
+				break;
+
+			case 'slot':
+				if(!bottom_option.length) {
+					$("#input-part").append('<option value="bottom">Bottom</option>');
+				}
+				$('#bottom-controls').show(250);
+				break;
+
+			case 'finger':
+				if(!bottom_option.length) {
+					$("#input-part").append('<option value="bottom">Bottom</option>');
+				}
+				$('#bottom-controls').hide(250);
+				break;
+
 		}
 
 		return options
@@ -68,15 +82,28 @@ function update() {
 			switch(options.part) {
 				case 'side':
 					var length = options.gender === GENDER_MALE ? options.box_length : options.box_width;
-					side = makeBoxSide(	length, 
-										options.box_depth, 
-										options.fingers, 
-										options.gender, 
-										options.material_thickness, 
-										options.bit_diameter, 
-										options.tab_width,
-										options.fit_allowance);
 
+					if(options.do_finger_bottom) {						
+						side = makeBoxWaffleSide(	length, 
+											options.box_depth, 
+											options.fingers, 
+											options.gender, 
+											options.material_thickness, 
+											options.bit_diameter, 
+											options.tab_width,
+											options.fit_allowance);
+
+					} else {
+						side = makeBoxSide(	length, 
+											options.box_depth, 
+											options.fingers, 
+											options.gender, 
+											options.material_thickness, 
+											options.bit_diameter, 
+											options.tab_width,
+											options.fit_allowance);						
+					}
+					console.log(side.dimensions())
 					geometry = [side];
 					if(options.do_slot) {
 						if(options.bottom_slot_thickness > options.material_thickness) {
@@ -103,10 +130,22 @@ function update() {
 					break;
 
 				case 'bottom':
-					bottom = makeRectangle(	options.box_length + 2*options.bottom_slot_thickness - 2*options.material_thickness, 
-											options.box_width + 2*options.bottom_slot_thickness - 2*options.material_thickness, 
-											options.bit_diameter,
-											options.tab_width);
+
+					if(options.do_finger_bottom) {
+						bottom = makeBoxWaffleBottom( 	options.box_length, 
+														options.box_width, 
+														options.fingers, 
+														options.material_thickness, 
+														options.bit_diameter, 
+														0, 0);
+						console.log(bottom.dimensions());
+//function(length, width, tabs, thickness, bitDiameter, tabWidth, fitAllowance)
+					} else {
+						bottom = makeRectangle(	options.box_length + 2*options.bottom_slot_thickness - 2*options.material_thickness, 
+												options.box_width + 2*options.bottom_slot_thickness - 2*options.material_thickness, 
+												options.bit_diameter,
+												options.tab_width);
+					}
 					geometry = [bottom];
 				break;
 			}
@@ -162,7 +201,7 @@ function makeSideGCode() {
 										60*options.feed_rate, 
 										60*options.plunge_rate, 
 										options.safe_z, 
-										options.tab_width)
+										options.tab_thickness)
 	} else {
 		var gSlotTitle = []
 		gSlot = [];
@@ -176,7 +215,7 @@ function makeSideGCode() {
 										60*options.feed_rate, 
 										60*options.plunge_rate, 
 										options.safe_z, 
-										options.tab_width);
+										options.tab_thickness);
 
 	// Teardown
 	var gTeardown = makeGCodeTeardown(options.safe_z);
@@ -202,7 +241,7 @@ function makeBottomGCode() {
 										60*options.feed_rate, 
 										60*options.plunge_rate, 
 										options.safe_z, 
-										options.tab_width);
+										options.tab_thickness);
 
 	// Teardown
 	var gTeardown = makeGCodeTeardown(options.safe_z);

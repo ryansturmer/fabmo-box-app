@@ -106,6 +106,14 @@ Turtle2D.prototype.unmark = function() {
 	this._mark = false;
 }
 
+Turtle2D.prototype.start = function() {
+	return this.history[0];
+}
+
+Turtle2D.prototype.end = function() {
+	return this.history[this.history.length-1];
+}
+
 Turtle2D.prototype.bounds = function() {
 	var retval = {xmin : this.pos.x, xmax : this.pos.x, ymin : this.pos.y, ymax : this.pos.y}
 	for(var i=0; i<this.history.length; i++) {
@@ -116,6 +124,15 @@ Turtle2D.prototype.bounds = function() {
 		retval.ymin = Math.min(p.y, retval.ymin);
 	}
 	return retval;
+}
+
+Turtle2D.prototype.dimensions = function() {
+	var b = this.bounds();
+	var w = b.xmax - b.xmin;
+	var h = b.ymax - b.ymin;
+
+	return {width:w, height:h};
+	
 }
 
 Turtle2D.prototype.translateToOrigin = function() {

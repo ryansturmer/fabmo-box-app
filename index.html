@@ -49,23 +49,24 @@
         <div role="tabpanel" class="tab-pane active" id="boxdims">
           <form class="form-horizontal" id="boxdims-form">          
             <div class="form-group">
-              <label for="input-part" class="col-sm-6 control-label">Box Part</label>
-              <div class="col-sm-6">
-                <select class="form-control update" id="input-part">
-                  <option value="male">Side (Male)</option>
-                  <option value="female">Side (Female)</option>
-                  <!--<option>Bottom</option>-->
-                </select>    
-              </div>
-            </div>
 
-            <div class="form-group">
               <label for="input-bottom_type" class="col-sm-6 control-label">Bottom Type</label>
               <div class="col-sm-6">
                 <select class="form-control update" id="input-bottom_type">
                   <option value="none">No Bottom</option>
                   <option value="slot">Slot</option>
                   <option value="finger">Finger Jointed</option>
+                </select>    
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label for="input-part" class="col-sm-6 control-label">Box Part</label>
+              <div class="col-sm-6">
+                <select class="form-control update" id="input-part">
+                  <option value="male">Side (Male)</option>
+                  <option value="female">Side (Female)</option>
+                  <!--<option>Bottom</option>-->
                 </select>    
               </div>
             </div>
@@ -89,7 +90,7 @@
               </div>
             </div>
             <div class="form-group">
-              <label for="input-material_thickness" class="col-sm-6 control-label">Box Depth</label>
+              <label for="input-box_depth" class="col-sm-6 control-label">Box Depth</label>
               <div class="col-sm-6">
                 <div class="input-group">
                   <input class="form-control num-input update" id="input-box_depth" value="2" step="0.25" type="number" min="0.0625" max="1000.0">
@@ -100,14 +101,14 @@
             <div class="form-group">
               <label for="input-fingers" class="col-sm-6 control-label">Number of Fingers</label>
               <div class="col-sm-6">
-                  <input class="form-control num-input update" id="input-fingers" value="4" type="number" min="2" max="100" step="1">
+                  <input class="form-control num-input update" id="input-fingers" value="3" type="number" min="2" max="100" step="1">
               </div>
             </div>
             <div class="form-group">
               <label for="input-material_thickness" class="col-sm-6 control-label">Material Thickness</label>
               <div class="col-sm-6">
                 <div class="input-group">
-                  <input class="form-control num-input update" id="input-material_thickness" value="0.25" step="0.05" type="number" min="0.03125" max="6.0">
+                  <input class="form-control num-input update" id="input-material_thickness" value="0.5" step="0.05" type="number" min="0.03125" max="6.0">
                   <span class="input-group-addon">in</span>
                 </div>
               </div>
@@ -151,7 +152,7 @@
         <div role="tabpanel" class="tab-pane" id="toolsettings">
           <form class="form-horizontal" id="toolsettings-form">
             <div class="form-group">
-              <label for="input-width" class="col-sm-6 control-label">Bit Diameter</label>
+              <label for="input-bit_diameter" class="col-sm-6 control-label">Bit Diameter</label>
               <div class="col-sm-6">
                 <div class="input-group">
                   <input class="form-control num-input update" id="input-bit_diameter" type="number" min="0.03125" max="2.0" value="0.125" step="0.03125">
@@ -161,7 +162,7 @@
             </div>
 
             <div class="form-group">
-              <label for="input-width" class="col-sm-6 control-label">Tab Width</label>
+              <label for="input-tab_width" class="col-sm-6 control-label">Tab Width</label>
               <div class="col-sm-6">
                 <div class="input-group">
                   <input class="form-control num-input update" id="input-tab_width" type="number" min="0" max="2.0" value="0.125" step="0.0625">
@@ -171,7 +172,17 @@
             </div>
 
             <div class="form-group">
-              <label for="input-width" class="col-sm-6 control-label">Safe Z</label>
+              <label for="input-tab_thickness" class="col-sm-6 control-label">Tab Thickness</label>
+              <div class="col-sm-6">
+                <div class="input-group">
+                  <input class="form-control num-input update" id="input-tab_thickness" type="number" min="0" max="2.0" value="0.125" step="0.0625">
+                  <span class="input-group-addon">in</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label for="input-safe_z" class="col-sm-6 control-label">Safe Z</label>
               <div class="col-sm-6">
                 <div class="input-group">
                   <input class="form-control num-input update" id="input-safe_z" type="number" min="0" max="1000.0" value="0.5" step="0.25">
@@ -181,7 +192,7 @@
             </div>
 
             <div class="form-group">
-              <label for="input-width" class="col-sm-6 control-label">Feed Rate</label>
+              <label for="input-feed_rate" class="col-sm-6 control-label">Feed Rate</label>
               <div class="col-sm-6">
                 <div class="input-group">
                   <input class="form-control num-input update" id="input-feed_rate" type="number" min="0.0001" max="10.0" value="2.0" step="0.25">
@@ -191,7 +202,7 @@
             </div>
 
             <div class="form-group">
-              <label for="input-width" class="col-sm-6 control-label">Plunge Rate</label>
+              <label for="input-plunge_rate" class="col-sm-6 control-label">Plunge Rate</label>
               <div class="col-sm-6">
                 <div class="input-group">
                   <input class="form-control num-input update" id="input-plunge_rate" type="number" min="0.0001" max="1000.0" value="0.25" step="0.0625">

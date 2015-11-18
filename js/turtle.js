@@ -126,6 +126,15 @@ Turtle2D.prototype.bounds = function() {
 	return retval;
 }
 
+Turtle2D.prototype.dimensions = function() {
+	var b = this.bounds();
+	var w = b.xmax - b.xmin;
+	var h = b.ymax - b.ymin;
+
+	return {width:w, height:h};
+	
+}
+
 Turtle2D.prototype.translateToOrigin = function() {
 	var b = this.bounds();
 	this.translate(-b.xmin, -b.ymin)

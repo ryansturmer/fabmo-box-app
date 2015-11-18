@@ -103,6 +103,7 @@ function update() {
 											options.tab_width,
 											options.fit_allowance);						
 					}
+					console.log(side.dimensions())
 					geometry = [side];
 					if(options.do_slot) {
 						if(options.bottom_slot_thickness > options.material_thickness) {
@@ -137,6 +138,7 @@ function update() {
 														options.material_thickness, 
 														options.bit_diameter, 
 														0, 0);
+						console.log(bottom.dimensions());
 //function(length, width, tabs, thickness, bitDiameter, tabWidth, fitAllowance)
 					} else {
 						bottom = makeRectangle(	options.box_length + 2*options.bottom_slot_thickness - 2*options.material_thickness, 
@@ -199,7 +201,7 @@ function makeSideGCode() {
 										60*options.feed_rate, 
 										60*options.plunge_rate, 
 										options.safe_z, 
-										options.tab_width)
+										options.tab_thickness)
 	} else {
 		var gSlotTitle = []
 		gSlot = [];
@@ -213,7 +215,7 @@ function makeSideGCode() {
 										60*options.feed_rate, 
 										60*options.plunge_rate, 
 										options.safe_z, 
-										options.tab_width);
+										options.tab_thickness);
 
 	// Teardown
 	var gTeardown = makeGCodeTeardown(options.safe_z);
@@ -239,7 +241,7 @@ function makeBottomGCode() {
 										60*options.feed_rate, 
 										60*options.plunge_rate, 
 										options.safe_z, 
-										options.tab_width);
+										options.tab_thickness);
 
 	// Teardown
 	var gTeardown = makeGCodeTeardown(options.safe_z);

@@ -142,6 +142,7 @@ var makeBoxEdge = function(width, tabs, gender, thickness, bitDiameter, dogbone,
 	var bitRadius = bitDiameter/2.0;
 	var dogBone = Math.sqrt(bitRadius*bitRadius/2.0)/2.0;
 
+	console.log("Segment size: " + segLength)
 	if(gender == GENDER_MALE) {
 		var slots = tabs-1;
 		var loc = segLength*1.5;
@@ -215,14 +216,14 @@ var makeBoxSide = function(length, width, tabs, gender, thickness, bitDiameter, 
 
 	box.rel(dx/2.0 - tabWidth/2.0 - bitDiameter/2.0, 0);
 	box.mark();
-	box.rel(tabWidth, 0);
+	box.rel(tabWidth+bitDiameter, 0);
 	box.unmark();
 
 	box.extend(edge2);
 
 	box.rel(-(dx/2.0 - tabWidth/2.0 - bitDiameter/2.0), 0);
 	box.mark();
-	box.rel(-tabWidth, 0);
+	box.rel(-tabWidth-bitDiameter, 0);
 	box.unmark();
 
 	start = edge1.history[0];
@@ -250,11 +251,11 @@ var makeBoxWaffleSide = function(length, width, tabs, gender, thickness, bitDiam
 	
 	edge2 = makeBoxEdge(width, tabs, gender, thickness, bitDiameter, true, 0);
 	edge2.pivot(0,0,Math.PI/2.0);
-	edge2.translate(length+bitDiameter, 0);
+	edge2.translate(length, 0);
 	edge2.reverse();
 
-	edge3 = makeBoxEdge(length-2*thickness, tabs, GENDER_MALE, thickness, bitDiameter, true, 0);
-	edge3.translate(bitRadius,0)
+	edge3 = makeBoxEdge(dx, tabs, GENDER_MALE, thickness, bitDiameter, true, 0);
+	//edge3.translate(bitRadius)
 	edge3.reverse();
 
 	// Left edge
@@ -281,7 +282,7 @@ var makeBoxWaffleSide = function(length, width, tabs, gender, thickness, bitDiam
 	box.unmark();
 */
 
-	start = edge1.history[0];
+	start = box.start();
 	box.abs(start.x, start.y)
 
 	//box.translate(-bitDiameter/2, -bitDiameter/2)
@@ -293,25 +294,30 @@ var makeBoxWaffleBottom = function(length, width, tabs, thickness, bitDiameter, 
 	
 	var gender = GENDER_FEMALE;
 
+	var length = length - 2*thickness;
+	var width = width - 2*thickness;
+	var bitRadius = bitDiameter/2.0;
+
 	edge1 = makeBoxEdge(width, tabs, gender, thickness, bitDiameter, true, 0);
 	edge1.pivot(0,0,Math.PI/2.0);
 	edge1.xmirror(0);
 	
 	edge2 = makeBoxEdge(length, tabs, gender, thickness, bitDiameter, true, 0);
 	edge2.ymirror(0);
-	edge2.translate(0,width)
+	edge2.translate(thickness, width+thickness);
 
 	edge3 = makeBoxEdge(width, tabs, gender, thickness, bitDiameter, true, 0);
 	edge3.pivot(0,0,Math.PI/2.0);
-	edge3.translate(length,0);
+	edge3.translate(length+2*thickness,0);
 	edge3.reverse();
 
 	edge4 = makeBoxEdge(length, tabs, gender, thickness, bitDiameter, true, 0);
+	edge4.translate(thickness, -thickness)
 	edge4.reverse();
 
 	// Left edge
 	box = new Turtle2D();
-	
+/*	
 	a = edge4.end();
 	b = edge1.start();
 
@@ -336,14 +342,21 @@ var makeBoxWaffleBottom = function(length, width, tabs, thickness, bitDiameter, 
 	edge3.rtrim(2);
 	edge3.abs(a.x, b.y);
 	edge4.ltrim(2);
+*/
 
+	var start = edge1.start();
+
+	box.abs(start.x, start.y);
+	
 	box.extend(edge1);
 	box.extend(edge2);
 	box.extend(edge3);
 	box.extend(edge4);
-	
-	start = box.history[0];
+
 	box.abs(start.x, start.y)
+	box.translateToOrigin();
+	box.translate(-bitRadius, -bitRadius)
+	console.log(box.dimensions())
 
 	return box;
 }

@@ -384,11 +384,12 @@ var makeGCodeFromTurtle = function(turtle, totalDepth, depthPerPass, feedRate, p
 	var depth = Math.max(totalDepth, -depthPerPass);
 	var pass = 1;
 	var tabDepth = totalDepth + tabThickness;
+	
+	retval.push('G0Z0'); // Rapid to surface of material, since plunges are generally slow
 
 	while(1) {
 		// Plunge
 		retval.push('(Plunge)');
-		retval.push('G0Z0'); // Rapid to surface of material, since plunges are generally slow
 		retval.push('G1 Z' + depth.toFixed(5) + 'F' + plungeRate);
 
 		// Cut contour
@@ -409,7 +410,7 @@ var makeGCodeFromTurtle = function(turtle, totalDepth, depthPerPass, feedRate, p
 			if(cutting_tab && !p.mark) {
 				cutting_tab = false;
 				if(depth < tabDepth) {
-					retval.push('G0 Z' + depth + ' F' + plungeRate); // Plunge rate because we're plunging
+					retval.push('G1 Z' + depth + ' F' + plungeRate); // Plunge rate because we're plunging
 				}				
 			}
 			retval.push('G1 X' + p.x.toFixed(5) + ' Y' + p.y.toFixed(5) + ' F' + feedRate);

@@ -25,6 +25,8 @@ function loadForm() {
 	$('#boxdims-form,#toolsettings-form').find('input,select').each(function(){
 		if(this.id in form_data) {
 			$(this).val(form_data[this.id]);
+		} else {
+			console.warn(this);
 		}
 	});
 
@@ -33,17 +35,27 @@ function loadForm() {
 function getOptions() {
 		// Extract options from the form
 		var options = {}
+
+		// Collect values from box dimensions form
 		$('#boxdims-form').find('input').each(function(){
 			var id = this.id.replace(/input-/gi, '');
 			options[id] = Number(this.value);
 		});
 
+		// Collect values from machining settings form
 		$('#toolsettings-form').find('input').each(function(){
 			var id = this.id.replace(/input-/gi, '');
 			options[id] = Number(this.value);
 		});
 
+		// Convert everything to inches (these are in thousandths)
+		options.fit_allowance = options.fit_allowance / 1000.0;
+		options.cut_through = options.cut_through / 1000.0;
+
+		// Number of fingers must be an integer (Don't admonish the user, just round)
 		options.fingers = Math.round(options.fingers);
+
+		// Gather the type and gender of the pieces
 		options.bottom_type = $('#input-bottom_type').val();
 		switch($('#input-part').val()) {
 			case "male":
@@ -64,11 +76,14 @@ function getOptions() {
 				console.error("Unknown part: " + $('#input-part').val())
 				break;
 		}
+
+		// Flags for what to do based on the chosen part/gender
 		options.do_slot = options.bottom_type === "slot"
 		options.do_finger_bottom = options.bottom_type === "finger"
 
-		bottom_option = $("#input-part option[value='bottom']");
 
+		// Hide the bottom option and settings if we're cutting a bottomless box
+		bottom_option = $("#input-part option[value='bottom']");
 		switch(options.bottom_type) {
 			case 'none':
 				$("#input-part option[value='bottom']").remove();
@@ -91,89 +106,95 @@ function getOptions() {
 
 		}
 
+		// Parsed and cleaned up options get returned
 		return options
 }
 
 
 function update() {
-		options = getOptions();
 
-		try {
-			var bitRadius = options.bit_diameter/2.0;
+	// Pull most up-to-date options from the form
+	options = getOptions();
 
-			switch(options.part) {
-				case 'side':
-					var length = options.gender === GENDER_MALE ? options.box_length : options.box_width;
+	try {
+		var bitRadius = options.bit_diameter/2.0;
 
-					if(options.do_finger_bottom) {						
-						side = makeBoxWaffleSide(	length, 
-											options.box_depth, 
-											options.fingers, 
-											options.gender, 
-											options.material_thickness, 
-											options.bit_diameter, 
-											options.tab_width,
-											options.fit_allowance);
+		switch(options.part) {
+			case 'side':
+				var length = options.gender === GENDER_MALE ? options.box_length : options.box_width;
 
-					} else {
-						side = makeBoxSide(	length, 
-											options.box_depth, 
-											options.fingers, 
-											options.gender, 
-											options.material_thickness, 
-											options.bit_diameter, 
-											options.tab_width,
-											options.fit_allowance);						
+				if(options.do_finger_bottom) {						
+					side = makeBoxWaffleSide(	length, 
+										options.box_depth, 
+										options.fingers, 
+										options.gender, 
+										options.material_thickness, 
+										options.bit_diameter, 
+										options.tab_width,
+										options.fit_allowance);
+
+				} else {
+					side = makeBoxSide(	length, 
+										options.box_depth, 
+										options.fingers, 
+										options.gender, 
+										options.material_thickness, 
+										options.bit_diameter, 
+										options.tab_width,
+										options.fit_allowance);						
+				}
+				console.log(side.dimensions())
+				geometry = [side];
+				if(options.do_slot) {
+					if(options.bottom_slot_thickness > options.material_thickness) {
+						throw new Error("Slot thickness for bottom is thicker than the material")
 					}
-					geometry = [side];
-					if(options.do_slot) {
-						if(options.bottom_slot_thickness > options.material_thickness) {
-							throw new Error("Slot thickness for bottom is thicker than the material")
-						}
 
-						if(options.bottom_height < options.bottom_thickness/2.0) {
-							throw new Error("Slot height too low")
-						}
-
-						if(options.bottom_height > options.box_depth-options.bottom_thickness) {
-							throw new Error("Slot height too high")								
-						}
-
-						slot = makePocket(	options.material_thickness-options.bottom_slot_thickness-bitRadius, 
-											options.bottom_height-options.bottom_thickness/2.0, 
-											length-(2*options.material_thickness)+2*options.bottom_slot_thickness+options.bit_diameter, 
-											options.bottom_thickness, 
-											options.bit_diameter);		
-						geometry.unshift(slot);
-					} else {
-						slot = null;
+					if(options.bottom_height < options.bottom_thickness/2.0) {
+						throw new Error("Slot height too low")
 					}
-					break;
 
-				case 'bottom':
-
-					if(options.do_finger_bottom) {
-						bottom = makeBoxWaffleBottom( 	options.box_length, 
-														options.box_width, 
-														options.fingers, 
-														options.material_thickness, 
-														options.bit_diameter, 
-														0, 0);
-//function(length, width, tabs, thickness, bitDiameter, tabWidth, fitAllowance)
-					} else {
-						bottom = makeRectangle(	options.box_length + 2*options.bottom_slot_thickness - 2*options.material_thickness, 
-												options.box_width + 2*options.bottom_slot_thickness - 2*options.material_thickness, 
-												options.bit_diameter,
-												options.tab_width);
+					if(options.bottom_height > options.box_depth-options.bottom_thickness) {
+						throw new Error("Slot height too high")								
 					}
-					geometry = [bottom];
+
+					slot = makePocket(	options.material_thickness-options.bottom_slot_thickness-bitRadius, 
+										options.bottom_height-options.bottom_thickness/2.0, 
+										length-(2*options.material_thickness)+2*options.bottom_slot_thickness+options.bit_diameter, 
+										options.bottom_thickness, 
+										options.bit_diameter);		
+					geometry.unshift(slot);
+				} else {
+					slot = null;
+				}
 				break;
-			}
-			ok();
-		} catch(e) {
-			error(e);
+
+			case 'bottom':
+
+				if(options.do_finger_bottom) {
+					bottom = makeBoxWaffleBottom( 	options.box_length, 
+													options.box_width, 
+													options.fingers, 
+													options.material_thickness, 
+													options.bit_diameter, 
+													0, // Tab width
+													options.fit_allowance);
+				} else {
+					bottom = makeRectangle(	options.box_length + 2*options.bottom_slot_thickness - 2*options.material_thickness, 
+											options.box_width + 2*options.bottom_slot_thickness - 2*options.material_thickness, 
+											options.bit_diameter,
+											options.tab_width);
+				}
+				geometry = [bottom];
+			break;
 		}
-		redraw();
+		ok();
+	} catch(e) {
+		error(e);
+	}
+
+	// Re-render (or show an error, if error() was called)
+	redraw();
 }
 
 preview = new CanvasPreview('viewport');
@@ -316,7 +337,7 @@ function onFormChange() {
 
 $(document).ready(function() {
   	$('#btn-cut').click(onCut);
-  	$('.update').change(onFormChange);
   	loadForm();
+  	$('.update').change(onFormChange);
   	update();
 });

@@ -255,8 +255,16 @@ function makeBottomGCode() {
 	
 	// Bottom
 	var gBottomTitle = ['', '(BOTTOM OF BOX)', ''];
+
+	// Finger jointed bottom uses the material thickness
+	// Slot bottom has its own thickness
+	var thickness = options.bottom_thickness;
+	if(options.do_finger_bottom) {
+		thickness = options.material_thickness;
+	}
+
 	var gBottom = makeGCodeFromTurtle(	bottom,
-										-options.material_thickness - options.cut_through, 
+										-thickness - options.cut_through, 
 										0.75*options.bit_diameter, 
 										60*options.feed_rate, 
 										60*options.plunge_rate, 

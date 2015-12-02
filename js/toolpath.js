@@ -101,7 +101,7 @@ var makePocket = function(startX, startY, xLength, yLength, bitDiameter) {
 	return t;
 }
 
-var makeSlot = function(width, length, bitDiameter, dogbone) {
+var makeSlot = function(width, length, bitDiameter, fitAllowance, dogbone) {
 	t = new Turtle2D();
 	var actualWidth = width - bitDiameter;
 	var actualLength = length;
@@ -109,7 +109,7 @@ var makeSlot = function(width, length, bitDiameter, dogbone) {
 	var dogBone = Math.sqrt(bitRadius*bitRadius/2.0)/2.0;
 
 	var bitRadius = bitDiameter/2.0;
-	t.abs(-actualWidth/2.0, -bitRadius);
+	t.abs(-actualWidth/2.0 - fitAllowance/2.0, -bitRadius);
 	
 	// Up
 	t.rel(0,actualLength);
@@ -121,7 +121,7 @@ var makeSlot = function(width, length, bitDiameter, dogbone) {
 	}
 
 	// Over
-	t.rel(actualWidth,0);
+	t.rel(actualWidth + fitAllowance,0);
 
  	// Dogbone
 	if(dogbone) {
@@ -135,7 +135,7 @@ var makeSlot = function(width, length, bitDiameter, dogbone) {
 	return t;
 }
 
-var makeBoxEdge = function(width, tabs, gender, thickness, bitDiameter, dogbone, fitAllowance) {
+var makeBoxEdge = function(width, tabs, gender, thickness, bitDiameter, fitAllowance, dogbone) {
 	
 	var segments = (tabs*2)-1
 	var segLength = width/segments;
@@ -146,6 +146,7 @@ var makeBoxEdge = function(width, tabs, gender, thickness, bitDiameter, dogbone,
 	if(gender == GENDER_MALE) {
 		var slots = tabs-1;
 		var loc = segLength*1.5;
+		fitAllowance = 0;
 	} else {
 		var slots = tabs;
 		tabs = slots-1;
@@ -160,7 +161,7 @@ var makeBoxEdge = function(width, tabs, gender, thickness, bitDiameter, dogbone,
 
 	// Cut the slots
 	for(var i=0; i<slots; i++) {
-		slot = makeSlot(segLength + fitAllowance, thickness, bitDiameter, dogbone);
+		slot = makeSlot(segLength + fitAllowance, thickness, bitDiameter, fitAllowance, dogbone);
 		slot.translate(loc, 0);
 		retval.extend(slot);
 		loc += 2*segLength;
@@ -173,9 +174,9 @@ var makeBoxEdge = function(width, tabs, gender, thickness, bitDiameter, dogbone,
 		retval.reverse();
 	} else {
 		retval.trim(3);
-		retval.rel(bitDiameter, 0);
+		retval.rel((bitDiameter-fitAllowance), 0);
 		retval.reverse();
-		retval.rel(-bitDiameter, 0);
+		retval.rel(-(bitDiameter-fitAllowance), 0);
 		retval.reverse()
 	}
 	return retval;
@@ -196,15 +197,18 @@ var makeBoxSide = function(length, width, tabs, gender, thickness, bitDiameter, 
 	if(thickness <= 0) {
 		throw new Error("Material thickness must be > 0!")
 	}
+	if(fitAllowance >= bitDiameter) {
+		throw new Error("Fit allowance cannot be greater than the bit diameter.  (Sorry!)")
+	}
 
 	var dx = length-2*thickness;
 
-	edge1 = makeBoxEdge(width, tabs, gender, thickness, bitDiameter, true, 0);
+	edge1 = makeBoxEdge(width, tabs, gender, thickness, bitDiameter, fitAllowance, true);
 	edge1.pivot(0,0,Math.PI/2.0);
 
 	edge1.xmirror(0);
 	
-	edge2 = makeBoxEdge(width, tabs, gender, thickness, bitDiameter, true, 0);
+	edge2 = makeBoxEdge(width, tabs, gender, thickness, bitDiameter, fitAllowance, true);
 	edge2.pivot(0,0,Math.PI/2.0);
 	edge2.translate(length, 0);
 	edge2.reverse();
@@ -240,21 +244,24 @@ var makeBoxWaffleSide = function(length, width, tabs, gender, thickness, bitDiam
 	if(thickness <= 0) {
 		throw new Error("Material thickness must be > 0!")
 	}
+	if(fitAllowance >= bitDiameter) {
+		throw new Error("Fit allowance cannot be greater than the bit diameter.  (Sorry!)")
+	}
 
 	var dx = length-2*thickness;
 	var bitRadius = bitDiameter/2.0;
 	
-	edge1 = makeBoxEdge(width, tabs, gender, thickness, bitDiameter, true, 0);
+	edge1 = makeBoxEdge(width, tabs, gender, thickness, bitDiameter, fitAllowance, true);
 	edge1.pivot(0,0,Math.PI/2.0);
 
 	edge1.xmirror(0);
 	
-	edge2 = makeBoxEdge(width, tabs, gender, thickness, bitDiameter, true, 0);
+	edge2 = makeBoxEdge(width, tabs, gender, thickness, bitDiameter, fitAllowance, true);
 	edge2.pivot(0,0,Math.PI/2.0);
 	edge2.translate(length, 0);
 	edge2.reverse();
 
-	edge3 = makeBoxEdge(dx, tabs, GENDER_MALE, thickness, bitDiameter, true, 0);
+	edge3 = makeBoxEdge(dx, tabs, GENDER_MALE, thickness, bitDiameter, fitAllowance, true);
 	//edge3.translate(bitRadius)
 	edge3.reverse();
 
@@ -298,23 +305,23 @@ var makeBoxWaffleBottom = function(length, width, tabs, thickness, bitDiameter, 
 	var bitRadius = bitDiameter/2.0;
 
 	// Left edge
-	edge1 = makeBoxEdge(width, tabs, gender, thickness, bitDiameter, true, 0);
+	edge1 = makeBoxEdge(width, tabs, gender, thickness, bitDiameter, fitAllowance, true);
 	edge1.pivot(0,0,Math.PI/2.0);
 	edge1.xmirror(0);
 	
 	// Top edge
-	edge2 = makeBoxEdge(length, tabs, gender, thickness, bitDiameter, true, 0);
+	edge2 = makeBoxEdge(length, tabs, gender, thickness, bitDiameter, fitAllowance, true);
 	edge2.ymirror(0);
 	edge2.translate(thickness, width+thickness);
 
 	// Right edge
-	edge3 = makeBoxEdge(width, tabs, gender, thickness, bitDiameter, true, 0);
+	edge3 = makeBoxEdge(width, tabs, gender, thickness, bitDiameter, fitAllowance, true);
 	edge3.pivot(0,0,Math.PI/2.0);
 	edge3.translate(length+2*thickness,0);
 	edge3.reverse();
 
 	// Bottom Edge
-	edge4 = makeBoxEdge(length, tabs, gender, thickness, bitDiameter, true, 0);
+	edge4 = makeBoxEdge(length, tabs, gender, thickness, bitDiameter, fitAllowance, true);
 	edge4.translate(thickness, -thickness)
 	edge4.reverse();
 

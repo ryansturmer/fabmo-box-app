@@ -5,6 +5,7 @@ var options;
 var geometry = [];
 var design_is_ok = false;
 
+var fabmo = new FabMoDashboard();
 
 function saveForm() {
 	form_data = {}
@@ -307,24 +308,26 @@ function onCut() {
 
 	// Just crap out if the design doesn't pass
 	if(!design_is_ok) {
-		fabmoDashboard.notify("error", "Can't cut this design.  Check your parameters!");
+		fabmo.notify("error", "Can't cut this design.  Check your parameters!");
 	}
 	var genderName = options.gender === GENDER_MALE ? 'male' : 'female';
 
 	switch(options.part) {
 		case 'side':
-			code = makeSideGCode();
-			fabmoDashboard.submitJob(code, {
-				filename : 'box_' +  genderName + '.nc',
-					name : 'Box Jointed Panel (' + genderName + ')'
+			fabmo.submitJob({
+				file: makeSideGCode(), 
+				filename : 'box_' + genderName + '.nc',
+					name : 'Box Jointed Panel (' + genderName + ')',
+				description: 'A ' + genderName + ' box jointed side-panel'
 			});
 			break;
 
 			case 'bottom':
-			code = makeBottomGCode();
-			fabmoDashboard.submitJob(code, {
+			fabmo.submitJob({
+				file: makeBottomGCode(), 
 				filename : 'box_bottom.nc',
-					name : 'Bottom of Box '
+				   	name : 'Box Jointed Bottom',
+				description: 'A box jointed bottom-panel'
 			});
 			break;
 	}	

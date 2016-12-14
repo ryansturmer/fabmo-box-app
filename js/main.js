@@ -177,17 +177,17 @@ function makeBoxSide(options) {
 			throw new Error("Slot height too high")								
 		}
 
-		bottom_slot = makePocket(	options.material_thickness-options.bottom_slot_thickness-options.bit_diameter/2.0, 
-							options.bottom_height-options.bottom_thickness/2.0, 
-							length-(2*options.material_thickness)+2*options.bottom_slot_thickness+options.bit_diameter, 
-							options.bottom_thickness, 
+		bottom_slot = makePocket(	options.material_thickness-options.bottom_slot_thickness-options.bit_diameter/2.0 - options.fit_allowance/2.0, 
+							options.bottom_height-options.bottom_thickness/2.0-options.fit_allowance/2.0, 
+							length-(2*options.material_thickness)+2*options.bottom_slot_thickness+options.bit_diameter + options.fit_allowance, 
+							options.bottom_thickness + options.fit_allowance, 
 							options.bit_diameter);		
 		geometry.unshift(bottom_slot);
 	} else {
 		bottom_slot = null;
 	}
 
-	if(options.top_type === 'slot' && !options.isFront) {
+	if(options.top_type === 'slot'/* && !options.isFront*/) {
 		if(options.bottom_slot_thickness > options.material_thickness) {
 			throw new Error("Slot thickness for bottom is thicker than the material")
 		}
@@ -200,10 +200,10 @@ function makeBoxSide(options) {
 			throw new Error("Slot height too high")								
 		}
 
-		top_slot = makePocket(	options.material_thickness-options.bottom_slot_thickness-options.bit_diameter/2.0, 
-							options.box_depth-options.bottom_height-options.bottom_thickness/2.0, 
-							length-(2*options.material_thickness)+2*options.bottom_slot_thickness+options.bit_diameter, 
-							options.bottom_thickness, 
+		top_slot = makePocket(	options.material_thickness-options.bottom_slot_thickness-options.bit_diameter/2.0-options.fit_allowance, 
+							options.box_depth-options.bottom_height-options.bottom_thickness/2.0 - options.fit_allowance/2.0, 
+							length-(2*options.material_thickness)+2*options.bottom_slot_thickness+options.bit_diameter + 2.0*options.fit_allowance, 
+							options.bottom_thickness + options.fit_allowance*2, 
 							options.bit_diameter);		
 		geometry.unshift(top_slot);
 	} else {
@@ -298,8 +298,8 @@ function makeSideGCode() {
 	
 	// Slot for bottom (if requested)
 	if(bottom_slot) {
-		var gSlotTitle = ['', '(SLOT FOR BOTTOM OF BOX)', ''];
-		var gSlot = makeGCodeFromTurtle(slot,
+		var gBottomSlotTitle = ['', '(SLOT FOR BOTTOM OF BOX)', ''];
+		var gBottomSlot = makeGCodeFromTurtle(bottom_slot,
 										-options.bottom_slot_thickness, 
 										0.75*options.bit_diameter, 
 										60*options.feed_rate, 
@@ -307,14 +307,14 @@ function makeSideGCode() {
 										options.safe_z, 
 										options.tab_thickness)
 	} else {
-		var gSlotTitle = []
-		gSlot = [];
+		var gBottomSlotTitle = []
+		gBottomSlot = [];
 	}
 
 	// Slot for bottom (if requested)
 	if(top_slot) {
-		var gSlotTitle = ['', '(SLOT FOR TOP OF BOX)', ''];
-		var gSlot = makeGCodeFromTurtle(slot,
+		var gTopSlotTitle = ['', '(SLOT FOR TOP OF BOX)', ''];
+		var gTopSlot = makeGCodeFromTurtle(top_slot,
 										-options.bottom_slot_thickness, 
 										0.75*options.bit_diameter, 
 										60*options.feed_rate, 
@@ -322,8 +322,8 @@ function makeSideGCode() {
 										options.safe_z, 
 										options.tab_thickness)
 	} else {
-		var gSlotTitle = []
-		gSlot = [];
+		var gTopSlotTitle = []
+		gTopSlot = [];
 	}
 
 	// Side
@@ -339,8 +339,11 @@ function makeSideGCode() {
 	// Teardown
 	var gTeardown = makeGCodeTeardown(options.safe_z);
 	
-	gSetup.extend(gSlotTitle);
-	gSetup.extend(gSlot);
+	gSetup.extend(gBottomSlotTitle);
+	gSetup.extend(gBottomSlot);
+	gSetup.extend(gTopSlotTitle);
+	gSetup.extend(gTopSlot);
+
 	gSetup.extend(gSideTitle);
 	gSetup.extend(gSide);
 	gSetup.extend(gTeardown);
@@ -394,8 +397,8 @@ function onCut() {
 			fabmo.submitJob({
 				file: makeSideGCode(), 
 				filename : 'box_' + options.partName + '.nc',
-					name : 'Box Jointed Panel (' + genderName + ')',
-				description: 'A ' + genderName + ' box jointed side-panel'
+					name : 'Panel (' + options.partName + ')',
+				description: 'A box-jointed ' + options.partName + ' panel.'
 			});
 			break;
 

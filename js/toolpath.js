@@ -208,7 +208,7 @@ var makeBoxToplessSide = function(length, width, tabs, gender, thickness, bitDia
 	if(isFront) {
 		pt = edge1.history[edge1.history.length-1];
 		edge1.rtrim(1);
-		edge1.abs(pt.x-(options.bottom_height + options.bit_diameter + options.fit_allowance + options.bottom_slot_thickness), pt.y);		
+		edge1.abs(pt.x-(options.bottom_height + options.bit_diameter + options.fit_allowance /*+ options.bottom_slot_thickness*/), pt.y);		
 	}
 	
 	edge1.pivot(0,0,Math.PI/2.0);
@@ -221,7 +221,7 @@ var makeBoxToplessSide = function(length, width, tabs, gender, thickness, bitDia
 	if(isFront) {
 		pt = edge2.history[edge2.history.length-1];
 		edge2.rtrim(1);
-		edge2.abs(pt.x-(options.bottom_height + options.bit_diameter + options.fit_allowance + options.bottom_slot_thickness), pt.y);		
+		edge2.abs(pt.x-(options.bottom_height + options.bit_diameter + options.fit_allowance /*+ options.bottom_slot_thickness*/), pt.y);		
 	}
 
 	edge2.pivot(0,0,Math.PI/2.0);

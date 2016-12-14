@@ -1,6 +1,7 @@
 
 var side;
-var slot;
+var bottom_slot;
+var top_slot;
 var options;
 var geometry = [];
 var design_is_ok = false;
@@ -58,29 +59,43 @@ function getOptions() {
 
 		// Gather the type and gender of the pieces
 		options.bottom_type = $('#input-bottom_type').val();
-		switch($('#input-part').val()) {
-			case "male":
-				options.gender = GENDER_MALE;
-				options.part = "side";
-				break;
+		options.top_type = $('#input-top_type').val();
 
-			case "female":
+		switch($('#input-part').val()) {
+			case "side":
 				options.gender = GENDER_FEMALE;
 				options.part = "side";
+				options.partName = 'side'
+				break;
+
+			case "front":
+				options.gender = GENDER_MALE;
+				options.part = "side";
+				options.isFront = true;
+				options.partName = 'front'
+				break;
+
+			case "back":
+				options.gender = GENDER_MALE;
+				options.part = "side";
+				options.partName = 'back'
 				break;
 
 			case "bottom":
 				options.part = "bottom";
+				options.partName = 'bottom'
+				break;
+
+			case "top":
+				options.part = "top";
+				options.partName = 'top'
 				break;
 
 			default:
-				console.error("Unknown part: " + $('#input-part').val())
+				msg = "Unknown part: " + $('#input-part').val();
+				console.error(msg);
 				break;
 		}
-
-		// Flags for what to do based on the chosen part/gender
-		options.do_slot = options.bottom_type === "slot"
-		options.do_finger_bottom = options.bottom_type === "finger"
 
 
 		// Hide the bottom option and settings if we're cutting a bottomless box
@@ -107,10 +122,115 @@ function getOptions() {
 
 		}
 
+		bottom_option = $("#input-part option[value='top']");
+		switch(options.top_type) {
+			case 'none':
+				$("#input-part option[value='top']").remove();
+				$('#bottom-controls').hide(250)						
+				break;
+			default:
+				if(!bottom_option.length) {
+					$("#input-part").append('<option value="top">Top</option>');
+				}
+				break;
+		}
+
 		// Parsed and cleaned up options get returned
 		return options
 }
 
+function makeBoxSide(options) {
+	var length = options.gender === GENDER_MALE ? options.box_width : options.box_length;
+
+	if(options.bottom_type == 'finger') {						
+		side = makeBoxWaffleSide(	length, 
+							options.box_depth, 
+							options.fingers, 
+							options.gender, 
+							options.material_thickness, 
+							options.bit_diameter, 
+							options.tab_width,
+							options.fit_allowance);
+
+	} else {
+		side = makeBoxToplessSide(	length, 
+							options.box_depth, 
+							options.fingers, 
+							options.gender, 
+							options.material_thickness, 
+							options.bit_diameter, 
+							options.tab_width,
+							options.fit_allowance,
+							options.isFront);						
+	}
+	var geometry = [side];
+	if(options.bottom_type === 'slot') {
+		if(options.bottom_slot_thickness > options.material_thickness) {
+			throw new Error("Slot thickness for bottom is thicker than the material")
+		}
+
+		if(options.bottom_height < options.bottom_thickness/2.0) {
+			throw new Error("Slot height too low")
+		}
+
+		if(options.bottom_height > options.box_depth-options.bottom_thickness) {
+			throw new Error("Slot height too high")								
+		}
+
+		bottom_slot = makePocket(	options.material_thickness-options.bottom_slot_thickness-options.bit_diameter/2.0, 
+							options.bottom_height-options.bottom_thickness/2.0, 
+							length-(2*options.material_thickness)+2*options.bottom_slot_thickness+options.bit_diameter, 
+							options.bottom_thickness, 
+							options.bit_diameter);		
+		geometry.unshift(bottom_slot);
+	} else {
+		bottom_slot = null;
+	}
+
+	if(options.top_type === 'slot' && !options.isFront) {
+		if(options.bottom_slot_thickness > options.material_thickness) {
+			throw new Error("Slot thickness for bottom is thicker than the material")
+		}
+
+		if(options.bottom_height < options.bottom_thickness/2.0) {
+			throw new Error("Slot height too low")
+		}
+
+		if(options.bottom_height > options.box_depth-options.bottom_thickness) {
+			throw new Error("Slot height too high")								
+		}
+
+		top_slot = makePocket(	options.material_thickness-options.bottom_slot_thickness-options.bit_diameter/2.0, 
+							options.box_depth-options.bottom_height-options.bottom_thickness/2.0, 
+							length-(2*options.material_thickness)+2*options.bottom_slot_thickness+options.bit_diameter, 
+							options.bottom_thickness, 
+							options.bit_diameter);		
+		geometry.unshift(top_slot);
+	} else {
+		top_slot = null;
+	}
+
+	return geometry;
+}
+
+function makeBoxBottom(options) {
+	if(options.do_finger_bottom) {
+		bottom = makeBoxWaffleBottom( 	options.box_length, 
+										options.box_width, 
+										options.fingers, 
+										options.material_thickness, 
+										options.bit_diameter, 
+										0, // Tab width
+										options.fit_allowance);
+	} else {
+		bottom = makeRectangle(	options.box_length + 2*options.bottom_slot_thickness - 2*options.material_thickness, 
+								options.box_width + 2*options.bottom_slot_thickness - 2*options.material_thickness, 
+								options.bit_diameter,
+								options.tab_width);
+	}
+	var geometry = [bottom];
+	return geometry
+}
 
 function update() {
 
@@ -119,78 +239,20 @@ function update() {
 
 	try {
 		var bitRadius = options.bit_diameter/2.0;
-
+		var sideGeom = makeBoxSide(options);
+		var bottomGeom = makeBoxBottom(options);
 		switch(options.part) {
 			case 'side':
-				var length = options.gender === GENDER_MALE ? options.box_length : options.box_width;
-
-				if(options.do_finger_bottom) {						
-					side = makeBoxWaffleSide(	length, 
-										options.box_depth, 
-										options.fingers, 
-										options.gender, 
-										options.material_thickness, 
-										options.bit_diameter, 
-										options.tab_width,
-										options.fit_allowance);
-
-				} else {
-					side = makeBoxSide(	length, 
-										options.box_depth, 
-										options.fingers, 
-										options.gender, 
-										options.material_thickness, 
-										options.bit_diameter, 
-										options.tab_width,
-										options.fit_allowance);						
-				}
-				console.log(side.dimensions())
-				geometry = [side];
-				if(options.do_slot) {
-					if(options.bottom_slot_thickness > options.material_thickness) {
-						throw new Error("Slot thickness for bottom is thicker than the material")
-					}
-
-					if(options.bottom_height < options.bottom_thickness/2.0) {
-						throw new Error("Slot height too low")
-					}
-
-					if(options.bottom_height > options.box_depth-options.bottom_thickness) {
-						throw new Error("Slot height too high")								
-					}
-
-					slot = makePocket(	options.material_thickness-options.bottom_slot_thickness-bitRadius, 
-										options.bottom_height-options.bottom_thickness/2.0, 
-										length-(2*options.material_thickness)+2*options.bottom_slot_thickness+options.bit_diameter, 
-										options.bottom_thickness, 
-										options.bit_diameter);		
-					geometry.unshift(slot);
-				} else {
-					slot = null;
-				}
+				geometry = sideGeom;
 				break;
-
+			case 'top':
 			case 'bottom':
-
-				if(options.do_finger_bottom) {
-					bottom = makeBoxWaffleBottom( 	options.box_length, 
-													options.box_width, 
-													options.fingers, 
-													options.material_thickness, 
-													options.bit_diameter, 
-													0, // Tab width
-													options.fit_allowance);
-				} else {
-					bottom = makeRectangle(	options.box_length + 2*options.bottom_slot_thickness - 2*options.material_thickness, 
-											options.box_width + 2*options.bottom_slot_thickness - 2*options.material_thickness, 
-											options.bit_diameter,
-											options.tab_width);
-				}
-				geometry = [bottom];
-			break;
+				geometry = bottomGeom;
+				break;
 		}
 		ok();
 	} catch(e) {
+		console.error(e)
 		error(e);
 	}
 
@@ -204,7 +266,7 @@ function redraw() {
 	container = document.getElementById('viewport-container');
 	preview.canvas.width = container.offsetWidth;
 	preview.canvas.height = container.offsetHeight;	
-	preview.draw(geometry);
+	preview.draw(geometry, 0.125);
 }
 
 window.addEventListener('resize', function(evt) {
@@ -235,8 +297,23 @@ function makeSideGCode() {
 	var gSetup = makeGCodeSetup(options.safe_z);
 	
 	// Slot for bottom (if requested)
-	if(slot) {
+	if(bottom_slot) {
 		var gSlotTitle = ['', '(SLOT FOR BOTTOM OF BOX)', ''];
+		var gSlot = makeGCodeFromTurtle(slot,
+										-options.bottom_slot_thickness, 
+										0.75*options.bit_diameter, 
+										60*options.feed_rate, 
+										60*options.plunge_rate, 
+										options.safe_z, 
+										options.tab_thickness)
+	} else {
+		var gSlotTitle = []
+		gSlot = [];
+	}
+
+	// Slot for bottom (if requested)
+	if(top_slot) {
+		var gSlotTitle = ['', '(SLOT FOR TOP OF BOX)', ''];
 		var gSlot = makeGCodeFromTurtle(slot,
 										-options.bottom_slot_thickness, 
 										0.75*options.bit_diameter, 
@@ -316,7 +393,7 @@ function onCut() {
 		case 'side':
 			fabmo.submitJob({
 				file: makeSideGCode(), 
-				filename : 'box_' + genderName + '.nc',
+				filename : 'box_' + options.partName + '.nc',
 					name : 'Box Jointed Panel (' + genderName + ')',
 				description: 'A ' + genderName + ' box jointed side-panel'
 			});

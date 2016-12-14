@@ -49,7 +49,17 @@
         <div role="tabpanel" class="tab-pane active" id="boxdims">
           <form class="form-horizontal" id="boxdims-form">          
             <div class="form-group">
+              <label for="input-top_type" class="col-sm-6 control-label">Top Type</label>
+              <div class="col-sm-6">
+                <select class="form-control update" id="input-top_type">
+                  <option value="none">No Top</option>
+                  <option value="slot">Slot</option>
+                  <option value="finger">Finger Jointed</option>
+                </select>    
+              </div>
+            </div>
 
+            <div class="form-group">
               <label for="input-bottom_type" class="col-sm-6 control-label">Bottom Type</label>
               <div class="col-sm-6">
                 <select class="form-control update" id="input-bottom_type">
@@ -64,8 +74,10 @@
               <label for="input-part" class="col-sm-6 control-label">Box Part</label>
               <div class="col-sm-6">
                 <select class="form-control update" id="input-part">
-                  <option value="male">Side (Male)</option>
-                  <option value="female">Side (Female)</option>
+                  <option value="side">Side</option>
+                  <option value="front">Front</option>
+                  <option value="back">Back</option>
+                  <option value="top">Top</option>
                   <option value="bottom">Bottom</option>
                 </select>    
               </div>
@@ -225,7 +237,7 @@
               <label for="input-cut_through" class="col-sm-6 control-label">Cut-Through</label>
               <div class="col-sm-6">
                 <div class="input-group">
-                  <input class="form-control num-input update" id="input-cut_through" type="number" min="0.000" max="1000.0" value="0.010" step="0.010">
+                  <input class="form-control num-input update" id="input-cut_through" type="number" min="0" max="1000" value="1" step="1">
                   <span class="input-group-addon">1/1000in</span>
                 </div>
               </div>

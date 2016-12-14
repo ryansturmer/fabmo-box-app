@@ -4,8 +4,9 @@ var CanvasPreview = function(id) {
 	this.context = this.canvas.getContext('2d');
 }
 
-CanvasPreview.prototype.draw = function(turtles) {
+CanvasPreview.prototype.draw = function(turtles, bitDiameter) {
 	var bounds = turtles[0].bounds();
+	bitDiameter = bitDiameter || 0;
 	turtles.forEach(function(turtle) {
 		b = turtle.bounds()
 		bounds.xmax = Math.max(bounds.xmax, b.xmax);
@@ -52,17 +53,37 @@ CanvasPreview.prototype.draw = function(turtles) {
 		context.lineTo(canvasWidth, scaleY(0));
 		context.stroke();
 
+	if(bitDiameter) {
+		turtles.forEach(function(turtle) {
+			context.beginPath();
+		    context.moveTo(scaleX(turtle.history[0].x), scaleY(turtle.history[0].y));
+		    turtle.history.forEach(function(p) {
+			    context.lineTo(scaleX(p.x), scaleY(p.y));
+		    });
+			context.fillStyle = 'lightblue';
+			context.strokeStyle = 'lightblue';
+			context.lineCap = 'round';
+			context.lineJoin = 'round';
+			context.lineWidth = scale*bitDiameter;
+
+			context.stroke();
+
+		});
+
+	}
+
 	turtles.forEach(function(turtle) {
 
 
 		context.beginPath();
-		context.strokeStyle = 'black';
 	    context.moveTo(scaleX(turtle.history[0].x), scaleY(turtle.history[0].y));
-
 	    turtle.history.forEach(function(p) {
-	    context.lineTo(scaleX(p.x), scaleY(p.y));
-
+	    	context.lineTo(scaleX(p.x), scaleY(p.y));
 	    });
+	    context.strokeStyle = 'black';
+		context.lineWidth = 1;
+		context.lineJoin = 'round';
+
 		context.stroke();
 
 	});
